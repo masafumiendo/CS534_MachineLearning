@@ -26,19 +26,22 @@ class LinearRegression:
                 _x = x_train[j, :]
                 _y = y_train[j]
                 _z = self.__regression(_x, weight)
-
+                
                 _gradient = - 2 * (_y - _z) * _x + 2 * regularization * weight
                 gradient += _gradient
                 
             gradient_normalize = gradient / (x_train.shape[0])
 
+            # Weight update
             weight = weight - lr * gradient_normalize
-
+            
+            # Save weight at each epoch for calculating validation error
             if epoch == 0:
                 weight_ref = weight
             else:
                 weight_ref = np.append(weight_ref, weight)
 
+            # Calculate training error
             _error_train = self.__calc_error(x_train, y_train, weight)
             error_train = np.append(error_train, _error_train)
 
@@ -98,7 +101,8 @@ class LinearRegression:
 
         num = x.shape[0]
         error = 0.
-
+        
+        # Loop for calculating error at each target
         for i in range(num):
 
             _x = x[i, :]
