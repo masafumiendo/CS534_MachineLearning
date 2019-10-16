@@ -29,8 +29,10 @@ class LinearRegression:
 
                 _gradient = - 2 * (_y - _z) * _x + 2 * regularization * weight
                 gradient += _gradient
+                
+            gradient_normalize = gradient / (x_train.shape[0])
 
-            weight = weight - lr * gradient
+            weight = weight - lr * gradient_normalize
 
             if epoch == 0:
                 weight_ref = weight
@@ -40,7 +42,7 @@ class LinearRegression:
             _error_train = self.__calc_error(x_train, y_train, weight)
             error_train = np.append(error_train, _error_train)
 
-            norm_gradient = np.sqrt(np.dot(gradient, gradient))
+            norm_gradient = np.sqrt(np.dot(gradient_normalize, gradient_normalize))
 
             if norm_gradient <= epsilon:
                 break
@@ -59,11 +61,9 @@ class LinearRegression:
         for i in range(epoch):
 
             p = np.random.permutation(len(x_valid))
-            _x_valid = x_valid[p]
-            _y_valid = y_valid[p]
             _weight = weight_ref[i, :]
 
-            error_valid[i] = self.__calc_error(_x_valid, _y_valid, _weight)
+            error_valid[i] = self.__calc_error(x_valid, y_valid, _weight)
 
         return error_valid
 
