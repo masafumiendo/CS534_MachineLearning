@@ -10,49 +10,48 @@ import matplotlib.pyplot as plt
 
 class LinearRegression:
 
-    # Constructor
-    def __init__(self, input_dim):
-
-        self.input_dim = input_dim
-        self.weight = np.random.random_sample(input_dim)
-
     # Public method
-    def train(self, x_train, y_train, batch_size, lr, regularization, epsilon):
+    def train(self, x_train, y_train, lr, regularization, epsilon):
 
+        weight = np.random.random_sample(x_train.shape[1])
         error_train = np.array([])
         epoch = 0
 
         while True:
 
-            p = np.random.permutation(len(x_train))
-            x_train = x_train[p]
-            y_train = y_train[p]
+            gradient = 0
 
-            for j in range(batch_size):
+            for j in range(x_train.shape[0]):
 
                 _x = x_train[j, :]
                 _y = y_train[j]
+                _z = self.__regression(_x, weight)
 
-                _weight_opt, gradient = self.__gradient(_x, _y, lr, regularization)
+                _gradient = - 2 * (_y - _z) * _x + 2 * regularization * weight
+                gradient += _gradient
 
-                if epoch == 0:
-                    weight_opt = _weight_opt
-                else:
-                    weight_opt = np.append(weight_opt, _weight_opt)
+            weight = weight - lr * gradient
 
-            _error_train = self.__calc_error(x_train, y_train, _weight_opt)
+            if epoch == 0:
+                weight_ref = weight
+            else:
+                weight_ref = np.append(weight_ref, weight)
+
+            _error_train = self.__calc_error(x_train, y_train, weight)
             error_train = np.append(error_train, _error_train)
 
-            if gradient <= epsilon:
+            norm_gradient = np.sqrt(np.dot(gradient, gradient))
+
+            if norm_gradient <= epsilon:
                 break
 
             epoch += 1
 
-        weight_opt = np.reshape(weight_opt, (-1, self.input_dim))
+        weight_ref = np.reshape(weight_ref, (-1, x_train.shape[1]))
 
-        return weight_opt, error_train, epoch
+        return weight, weight_ref, error_train, epoch
 
-    def valid(self, x_valid, y_valid, weight_opt, epoch):
+    def valid(self, x_valid, y_valid, weight_ref, epoch):
 
         error_valid = np.zeros(epoch)
 
@@ -62,20 +61,20 @@ class LinearRegression:
             p = np.random.permutation(len(x_valid))
             _x_valid = x_valid[p]
             _y_valid = y_valid[p]
-            _weight_opt = weight_opt[i, :]
+            _weight = weight_ref[i, :]
 
-            error_valid[i] = self.__calc_error(_x_valid, _y_valid, _weight_opt)
+            error_valid[i] = self.__calc_error(_x_valid, _y_valid, _weight)
 
         return error_valid
 
-    def predict(self, x_test, weight_opt):
+    def predict(self, x_test, weight):
 
         num = x_test.shape[0]
         y_test = np.zeros(num)
 
         for i in range(num):
 
-            y_test[i] = self.regression(x_test[i, :], weight_opt[-1])
+            y_test[i] = self.__regression(x_test[i, :], weight)
             print("Predicted cost is $", y_test[i], ".")
 
         return y_test
@@ -95,21 +94,6 @@ class LinearRegression:
 
         return np.dot(x, weight)
 
-    def __gradient(self, x, y, lr, regularization):
-
-        z = self.__regression(x, self.weight)
-        gradient = - (y - z) * x + (regularization / 2.) * self.weight
-        self.weight += lr * gradient
-
-        print(x)
-        print(y)
-        print(z)
-        print(gradient)
-
-        weight_opt = self.weight
-
-        return weight_opt, gradient
-
     def __calc_error(self, x, y, weight):
 
         num = x.shape[0]
@@ -121,7 +105,7 @@ class LinearRegression:
             _y = y[i]
 
             _z = self.__regression(_x, weight)
-            error += (_y - _z) ** 2 / 2
+            error += (_y - _z) ** 2
 
         return error
 
@@ -130,7 +114,7 @@ class FeatureEngineering:
     def train_valid(self, path):
 
         df = pd.read_csv(path)
-        x = df.drop(['dummy', 'id', 'price'], axis=1)
+        x = df.drop(['dummy', 'id', 'price', 'waterfront', 'view', 'zipcode'], axis=1)
         y = df.loc[:, 'price']
 
         x_datetime = pd.to_datetime(x['date'], infer_datetime_format=True)
@@ -139,14 +123,16 @@ class FeatureEngineering:
         x = x.drop(['date'], axis=1)
         x = pd.concat([x_date, x], axis=1)
 
-        x, y = x.values, y.values
+        x_normalized = (x - x.min()) / (x.max() - x.min())
+
+        x, y = x_normalized.values, y.values
 
         return x, y
 
     def predict(self, path):
 
         df = pd.read_csv(path)
-        x = df.drop(['dummy', 'id'], axis=1)
+        x = df.drop(['dummy', 'id', 'waterfront', 'view', 'zipcode'], axis=1)
 
         x_datetime = pd.to_datetime(x['date'], infer_datetime_format=True)
         x_year, x_month, x_day = x_datetime.dt.year, x_datetime.dt.month, x_datetime.dt.day
@@ -154,7 +140,9 @@ class FeatureEngineering:
         x = x.drop(['date'], axis=1)
         x = pd.concat([x_date, x], axis=1)
 
-        x = x.values
+        x_normalized = (x - x.min()) / (x.max() - x.min())
+
+        x = x_normalized.values
 
         return x
 
@@ -166,19 +154,18 @@ def main():
     x_valid, y_valid = feature_eng.train_valid('../data/PA1_dev.csv')
     x_test = feature_eng.predict('../data/PA1_test.csv')
 
-    batch_size = 1000
     lr = 0.1
     regularization = 0.1
     epsilon = 0.5
 
-    linear_regression = LinearRegression(input_dim=x_train.shape[1])
+    linear_regression = LinearRegression()
 
-    weight_opt, error_train, epoch = linear_regression.train(x_train, y_train, batch_size, lr, regularization, epsilon)
-    error_valid = linear_regression.valid(x_valid, y_valid, weight_opt, epoch)
+    weight, weight_ref, error_train, epoch = linear_regression.train(x_train, y_train, lr, regularization, epsilon)
+    error_valid = linear_regression.valid(x_valid, y_valid, weight_ref, epoch)
 
-    linear_regression.error_graph('error.fig', error_train, error_valid)
+    linear_regression.error_graph('error.png', error_train, error_valid)
 
-    y_test = linear_regression.predict(x_test, weight_opt)
+    y_test = linear_regression.predict(x_test, weight)
 
 if __name__ == '__main__':
     main()
