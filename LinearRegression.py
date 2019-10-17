@@ -43,7 +43,8 @@ class LinearRegression:
 
             # Calculate training error
             _error_train = self.__calc_error(x_train, y_train, weight)
-            error_train = np.append(error_train, _error_train)
+            _error_train_normalize = _error_train / x_train.shape[0]
+            error_train = np.append(error_train, _error_train_normalize)
 
             norm_gradient = np.sqrt(np.dot(gradient_normalize, gradient_normalize))
 
@@ -63,10 +64,8 @@ class LinearRegression:
         # Loop for computing error
         for i in range(epoch):
 
-            p = np.random.permutation(len(x_valid))
             _weight = weight_ref[i, :]
-
-            error_valid[i] = self.__calc_error(x_valid, y_valid, _weight)
+            error_valid[i] = self.__calc_error(x_valid, y_valid, _weight) / x_valid.shape[0]
 
         return error_valid
 
