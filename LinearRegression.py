@@ -153,9 +153,9 @@ def main():
 
     feature_eng = FeatureEngineering()
 
-    x_train, y_train = feature_eng.train_valid('../data/PA1_train.csv')
-    x_valid, y_valid = feature_eng.train_valid('../data/PA1_dev.csv')
-    x_test = feature_eng.predict('../data/PA1_test.csv')
+    x_train, y_train = feature_eng.train_valid('C:\Fall 2019\CS534_MachineLearning\PA1_train.csv')
+    x_valid, y_valid = feature_eng.train_valid('C:\Fall 2019\CS534_MachineLearning\PA1_dev.csv')
+    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv')
 
     lr = 0.1
     regularization = 0.1
