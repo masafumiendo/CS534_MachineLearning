@@ -14,11 +14,12 @@ class LinearRegression:
     def train(self, x_train, y_train, lr, regularization, epsilon):
 
         weight = np.random.random_sample(x_train.shape[1])
+        weight = np.zeros(x_train.shape[1])
         error_train = np.array([])
         epoch = 0
+        max_epoch = 500
 
         while True:
-
             gradient = 0
 
             for j in range(x_train.shape[0]):
@@ -26,15 +27,16 @@ class LinearRegression:
                 _x = x_train[j, :]
                 _y = y_train[j]
                 _z = self.__regression(_x, weight)
-                
-                _gradient = - 2 * (_y - _z) * _x + 2 * regularization * weight
+
+                _gradient = - 2 * (_y - _z) * _x
                 gradient += _gradient
-                
-            gradient_normalize = gradient / (x_train.shape[0])
+
+            # gradient_normalize = gradient / (x_train.shape[0])gradient_normalize
+            gradient +=2 * regularization * weight
 
             # Weight update
-            weight = weight - lr * gradient_normalize
-            
+            weight = weight - lr * gradient
+
             # Save weight at each epoch for calculating validation error
             if epoch == 0:
                 weight_ref = weight
@@ -43,12 +45,13 @@ class LinearRegression:
 
             # Calculate training error
             _error_train = self.__calc_error(x_train, y_train, weight)
-            _error_train_normalize = _error_train / x_train.shape[0]
-            error_train = np.append(error_train, _error_train_normalize)
+            error_train = np.append(error_train, _error_train)
 
-            norm_gradient = np.sqrt(np.dot(gradient_normalize, gradient_normalize))
+            norm__error_train = np.dot(_error_train,_error_train)          # SSE
+            norm_gradient = np.sqrt(np.dot(gradient, gradient))             # Norm of the gradient
+            print(epoch)
 
-            if norm_gradient <= epsilon:
+            if norm_gradient <= epsilon or epoch > max_epoch:
                 break
 
             epoch += 1
@@ -65,7 +68,7 @@ class LinearRegression:
         for i in range(epoch):
 
             _weight = weight_ref[i, :]
-            error_valid[i] = self.__calc_error(x_valid, y_valid, _weight) / x_valid.shape[0]
+            error_valid[i] = self.__calc_error(x_valid, y_valid, _weight)
 
         return error_valid
 
@@ -89,7 +92,7 @@ class LinearRegression:
         plt.xlabel('epoch')
         plt.ylabel('loss')
         plt.legend()
-        plt.savefig('../fig/' + figname)
+        #plt.savefig('../fig/' + figname)
         plt.close(fig)
 
     def __regression(self, x, weight):
@@ -100,7 +103,7 @@ class LinearRegression:
 
         num = x.shape[0]
         error = 0.
-        
+
         # Loop for calculating error at each target
         for i in range(num):
 
@@ -114,11 +117,10 @@ class LinearRegression:
 
 class FeatureEngineering:
 
-    def train_valid(self, path):
+    def train(self, path):
 
         df = pd.read_csv(path)
-        x = df.drop(['dummy', 'id', 'price', 'waterfront', 'view', 'zipcode'], axis=1)
-        y = df.loc[:, 'price']
+        x = df.drop(['dummy', 'id'], axis=1)
 
         x_datetime = pd.to_datetime(x['date'], infer_datetime_format=True)
         x_year, x_month, x_day = x_datetime.dt.year, x_datetime.dt.month, x_datetime.dt.day
@@ -126,16 +128,46 @@ class FeatureEngineering:
         x = x.drop(['date'], axis=1)
         x = pd.concat([x_date, x], axis=1)
 
-        x_normalized = (x - x.min()) / (x.max() - x.min())
+        x_min = x.min()
+        x_max = x.max()
 
+        x_normalized = (x - x_min) / (x_max - x_min)
+
+        x_id = df.loc[:, 'dummy']
+        x_normalized = pd.concat([x_id, x_normalized], axis=1)
+
+        y = x_normalized.loc[:, 'price']
+        x, y = x_normalized.values, y.values
+
+        return x, y, x_min, x_max
+
+    def valid(self, path, x_min, x_max):
+
+        df = pd.read_csv(path)
+        x = df.drop(['dummy', 'id'], axis=1)
+
+        x_datetime = pd.to_datetime(x['date'], infer_datetime_format=True)
+        x_year, x_month, x_day = x_datetime.dt.year, x_datetime.dt.month, x_datetime.dt.day
+        x_date = pd.DataFrame({'year': x_year, 'month': x_month, 'day': x_day})
+        x = x.drop(['date'], axis=1)
+        x = pd.concat([x_date, x], axis=1)
+
+        x_normalized = (x - x_min) / (x_max - x_min)
+
+        x_id = df.loc[:, 'dummy']
+        x_normalized = pd.concat([x_id, x_normalized], axis=1)
+
+        y = x_normalized.loc[:, 'price']
         x, y = x_normalized.values, y.values
 
         return x, y
 
-    def predict(self, path):
+    def predict(self, path, x_min, x_max):
+        x_min = x_min.drop(['price'])
+        x_max = x_max.drop(['price'])
 
         df = pd.read_csv(path)
-        x = df.drop(['dummy', 'id', 'waterfront', 'view', 'zipcode'], axis=1)
+        x = df.drop(['dummy', 'id'], axis=1)
 
         x_datetime = pd.to_datetime(x['date'], infer_datetime_format=True)
         x_year, x_month, x_day = x_datetime.dt.year, x_datetime.dt.month, x_datetime.dt.day
@@ -143,7 +175,9 @@ class FeatureEngineering:
         x = x.drop(['date'], axis=1)
         x = pd.concat([x_date, x], axis=1)
 
-        x_normalized = (x - x.min()) / (x.max() - x.min())
+        x_normalized = (x - x_min) / (x_max - x_min)
+        x_id = df.loc[:, 'dummy']
+        x_normalized = pd.concat([x_id, x_normalized], axis=1)
 
         x = x_normalized.values
 
@@ -153,12 +187,12 @@ def main():
 
     feature_eng = FeatureEngineering()
 
-    x_train, y_train = feature_eng.train_valid('C:\Fall 2019\CS534_MachineLearning\PA1_train.csv')
-    x_valid, y_valid = feature_eng.train_valid('C:\Fall 2019\CS534_MachineLearning\PA1_dev.csv')
-    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv')
+    x_train, y_train, x_min, x_max = feature_eng.train('C:\Fall 2019\CS534_MachineLearning\PA1_train.csv')
+    x_valid, y_valid = feature_eng.valid('C:\Fall 2019\CS534_MachineLearning\PA1_dev.csv', x_min, x_max)
+    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv', x_min, x_max)
 
-    lr = 0.1
-    regularization = 0.1
+    lr = 0.00001
+    regularization = 0
     epsilon = 0.5
 
     linear_regression = LinearRegression()
