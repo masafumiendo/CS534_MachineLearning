@@ -19,10 +19,11 @@ class LinearRegression:
         weight_ref = weight
 
         error_train = self.__calc_error(x_train, y_train, weight)
+        error_train_normalize = error_train / x_train.shape[0]
         error_train_pre = error_train
 
         epoch = 1
-        max_epoch = 100
+        max_epoch = 1000
         count = 0  # To check whether exploding
 
         while True:
@@ -44,7 +45,8 @@ class LinearRegression:
 
             # Calculate training error
             _error_train = self.__calc_error(x_train, y_train, weight)          # SSE
-            error_train = np.append(error_train, _error_train)
+            _error_train_normalize = _error_train / x_train.shape[0]
+            error_train_normalize = np.append(error_train_normalize, _error_train_normalize)
 
             norm_gradient = np.sqrt(np.dot(gradient, gradient))  # Norm of the gradient
             print(_error_train)
@@ -66,7 +68,7 @@ class LinearRegression:
 
         weight_ref = np.reshape(weight_ref, (-1, x_train.shape[1]))
 
-        return weight, weight_ref, error_train, epoch
+        return weight, weight_ref, error_train_normalize, epoch
 
     def valid(self, x_valid, y_valid, weight_ref, epoch):
 
@@ -77,7 +79,8 @@ class LinearRegression:
             _weight = weight_ref[i, :]
             error_valid[i] = self.__calc_error(x_valid, y_valid, _weight)
 
-        return error_valid
+        error_valid_normalize = error_valid / x_valid.shape[0]
+        return error_valid_normalize
 
     def predict(self, x_test, weight, x_min, x_max):
 
@@ -101,7 +104,7 @@ class LinearRegression:
         plt.legend()
         #plt.yscale('log')
         #plt.xscale('log')
-        # plt.show()
+        plt.show()
         plt.savefig('figure_part1/' + figname)
         plt.close(fig)
 
@@ -205,16 +208,16 @@ def main():
     regularization = 0
     epsilon = 0.5
     #lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7]
-    lr_mat = [1e-5]
+    lr_mat = [1e-6]
 
     for j in range(len(lr_mat)):
         lr = lr_mat[j]
         linear_regression = LinearRegression()
 
-        weight, weight_ref, error_train, epoch = linear_regression.train(x_train, y_train, lr, regularization, epsilon)
-        error_valid = linear_regression.valid(x_valid, y_valid, weight_ref, epoch)
+        weight, weight_ref, error_train_normalize, epoch = linear_regression.train(x_train, y_train, lr, regularization, epsilon)
+        error_valid_normalize = linear_regression.valid(x_valid, y_valid, weight_ref, epoch)
 
-        linear_regression.error_graph('error_lr{}.png'.format(lr), error_train, error_valid)
+        linear_regression.error_graph('error_lr{}.png'.format(lr), error_train_normalize, error_valid_normalize)
         aa = x_min.loc['price']
         y_test = linear_regression.predict(x_test, weight, x_min.loc['price'], x_max.loc['price'])
 
