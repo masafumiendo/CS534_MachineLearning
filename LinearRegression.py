@@ -23,7 +23,7 @@ class LinearRegression:
         error_train_pre = error_train
 
         epoch = 1
-        max_epoch = 1000
+        max_epoch = 100
         count = 0  # To check whether exploding
 
         while True:
