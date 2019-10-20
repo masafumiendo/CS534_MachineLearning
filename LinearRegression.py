@@ -262,8 +262,8 @@ if __name__ == '__main__':
 
     regularization = 0
     epsilon = 0.5
-    #lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7] , 1e-6, 1e-7
-    lr_mat = [1e-1, 1e-5]
+    lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7] #, 1e-6, 1e-7
+    #lr_mat = [1e-1, 1e-5]
     dict_sse = {} 
     dict_pred = {}
 

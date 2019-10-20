@@ -100,6 +100,8 @@ if __name__ == '__main__':
         df_num.loc[str(n), "Min"] = np.min(values)
         df_num.loc[str(n), "Max"] = np.max(values)
         
+    df_num.to_csv("df_num.csv")
+        
     # categorical barplots
     df_cat = df.drop(numerical, axis = 1)
     for c in categorical:

@@ -23,7 +23,7 @@ class LinearRegression:
         error_train_pre = error_train
 
         epoch = 1
-        max_epoch = 10
+        max_epoch = 1000
         count = 0  # To check whether exploding
         flag_div = False
 
@@ -148,7 +148,7 @@ class LinearRegression:
         plt.ylabel('SSE')
         plt.legend()
         plt.yscale('log')
-        plt.xscale('log')
+        #plt.xscale('log')
         #plt.show()
         plt.savefig('figure_part2/{}_sse_epoch_reg.png'.format(title), bbox_inches = "tight")
         plt.close(fig)
@@ -295,7 +295,12 @@ if __name__ == '__main__':
 
             dict_valid_sse[r] = error_valid_normalize
             dict_train_sse[r] = error_train_normalize
-
+            
+            if r == 0:
+                with open("y_test.txt") as f:
+                    for pred in y_test:
+                        f.write(pred)
+                        
     linear_regression.plot_sse_epoch(dict_train_sse, "Train")
     linear_regression.plot_sse_epoch(dict_valid_sse, "Validation")
 
@@ -303,7 +308,9 @@ if __name__ == '__main__':
     
     print("Weights for various regularization parameters:")
     print(df_weight)
+    df_weight.to_csv("figure_part2/df_weight_part2.csv")
     
     print("SSE:")
     print(df_sse)
+    df_sse.to_csv("figure_part2/df_sse_part2.csv")
         
