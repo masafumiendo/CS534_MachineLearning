@@ -14,8 +14,8 @@ class LinearRegression:
     # Public method
     def train(self, x_train, y_train, lr, regularization, epsilon):
 
-        weight = np.random.random_sample(x_train.shape[1])
-        #weight = np.zeros(x_train.shape[1])
+        #weight = np.random.random_sample(x_train.shape[1])
+        weight = np.zeros(x_train.shape[1])
         weight_ref = weight
 
         error_train = self.__calc_error(x_train, y_train, weight)
@@ -23,8 +23,9 @@ class LinearRegression:
         error_train_pre = error_train
 
         epoch = 1
-        max_epoch = 1000
+        max_epoch = 100
         count = 0  # To check whether exploding
+        flag_div = False
 
         while True:
             gradient = 0
@@ -62,13 +63,15 @@ class LinearRegression:
                 error_train_pre = _error_train
 
             if norm_gradient <= epsilon or epoch > max_epoch or count > 9:
+                if count > 9:
+                    flag_div = True
                 break
-
+            
             epoch += 1
 
         weight_ref = np.reshape(weight_ref, (-1, x_train.shape[1]))
 
-        return weight, weight_ref, error_train_normalize, epoch
+        return weight, weight_ref, error_train_normalize, epoch, flag_div
 
     def valid(self, x_valid, y_valid, weight_ref, epoch):
 
@@ -89,24 +92,34 @@ class LinearRegression:
 
         for i in range(num):
             y_test[i] = self.__regression(x_test[i, :], weight)
-            #y_test[i] = (x_max - x_min) * y_test[i] + x_min  # Reverse the normalization
-            print("Predicted cost is $", y_test[i], ".")
+            y_test[i] = (x_max - x_min) * y_test[i] + x_min  # Reverse the normalization
+         #   print("Predicted cost is $", y_test[i], ".")
 
         return y_test
 
-    def error_graph(self, figname, error_train, error_valid):
+    def error_graph(self, figname, error,  flag_div, title):
 
-        fig = plt.figure()
-        plt.plot(np.arange(0, error_train.shape[0]), error_train, label='training error')
-        plt.plot(np.arange(0, error_valid.shape[0]), error_valid, label='validation error')
-        plt.xlabel('epoch')
-        plt.ylabel('loss')
-        plt.legend()
-        #plt.yscale('log')
-        #plt.xscale('log')
-        #plt.show()
-        plt.savefig('figure_part1/' + figname)
-        plt.close(fig)
+        if flag_div == True: 
+            fig = plt.figure()
+            plt.plot(np.arange(0, error.shape[0]), error)
+            
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+           
+            plt.yscale('log')
+            plt.xscale('log')
+            plt.title(str(title))
+            plt.savefig('figure_part1/' + figname)
+            plt.close(fig)
+            
+        else:
+            fig = plt.figure()
+            plt.plot(np.arange(0, error.shape[0]), error)
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.title(str(title))
+            plt.savefig('figure_part1/' + figname)
+            plt.close(fig)
 
     def __regression(self, x, weight):
 
@@ -243,14 +256,14 @@ if __name__ == '__main__':
 #    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv', x_min, x_max)
 
     x_train, y_train, x_min, x_max = feature_eng.train('PA1_train.csv')
-    x_valid, y_valid = feature_eng.valid('PA1_dev.csv', x_min, x_max)
+    x_valid, y_valid_true = feature_eng.valid('PA1_dev.csv', x_min, x_max)
     x_test = feature_eng.predict('PA1_test.csv', x_min, x_max)
 
 
     regularization = 0
     epsilon = 0.5
-    #lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7]
-    lr_mat = [1e-5, 1e-6, 1e-7]
+    #lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7] , 1e-6, 1e-7
+    lr_mat = [1e-1, 1e-5]
     dict_sse = {} 
     dict_pred = {}
 
@@ -258,18 +271,23 @@ if __name__ == '__main__':
         lr = lr_mat[j]
         linear_regression = LinearRegression()
 
-        weight, weight_ref, error_train_normalize, epoch = linear_regression.train(x_train, y_train, lr, regularization, epsilon)
-        error_valid_normalize = linear_regression.valid(x_valid, y_valid, weight_ref, epoch)
+        weight, weight_ref, error_train_normalize, epoch, flag_div = linear_regression.train(x_train, y_train, lr, regularization, epsilon)
+        error_valid_normalize = linear_regression.valid(x_valid, y_valid_true, weight_ref, epoch)
 
-        linear_regression.error_graph('error_lr{}.png'.format(lr), error_train_normalize, error_valid_normalize)
+        linear_regression.error_graph('train_error_lr{}.png'.format(lr), error_train_normalize, flag_div, "Training SSE")
+        linear_regression.error_graph('valid_error_lr{}.png'.format(lr), error_valid_normalize, flag_div, "Validation SSE")
+        
         y_test = linear_regression.predict(x_test, weight, x_min.loc['price'], x_max.loc['price'])
-        y_pred = linear_regression.predict(x_valid, weight, x_min.loc['price'], x_max.loc['price'])
         
-        diff = linear_regression.percent_diff(y_valid, y_pred)
-        dict_pred[lr] = diff
 
-        dict_sse[lr] = error_valid_normalize
-        
+        if flag_div == False: 
+            y_valid_pred = linear_regression.predict(x_valid, weight, x_min.loc['price'], x_max.loc['price'])
+            y_valid_true = (x_max.price - x_min.price) * y_valid_true + x_min.price
+            diff = linear_regression.percent_diff(y_valid_true, y_valid_pred)
+            dict_pred[lr] = diff
+
+            dict_sse[lr] = error_valid_normalize
+
     linear_regression.plot_sse_epoch(dict_sse)
 
     linear_regression.plot_box_lr(dict_pred)
