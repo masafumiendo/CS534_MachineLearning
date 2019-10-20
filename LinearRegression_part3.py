@@ -22,7 +22,7 @@ class LinearRegression:
         error_train_pre = error_train
 
         epoch = 1
-        max_epoch = 100
+        max_epoch = 10000
         count = 0  # To check whether exploding
         flag_div = False
 
@@ -60,8 +60,8 @@ class LinearRegression:
                 count = 0
                 error_train_pre = _error_train
 
-            if norm_gradient <= epsilon or epoch > max_epoch or count > 9:
-                if count > 9:
+            if norm_gradient <= epsilon or epoch > max_epoch or count > 7:
+                if count > 7:
                     flag_div = True
                 break
 
@@ -89,7 +89,7 @@ class LinearRegression:
 
         for i in range(num):
             y_test[i] = self.__regression(x_test[i, :], weight)
-            print("Predicted cost is $", y_test[i], ".")
+            # print("Predicted cost is $", y_test[i], ".")
 
         return y_test
 
@@ -98,26 +98,21 @@ class LinearRegression:
         if flag_div:
             fig = plt.figure()
             plt.plot(np.arange(0, error.shape[0]), error)
-            # plt.plot(np.arange(0, error_valid.shape[0]), error_valid, label='validation error')
             plt.xlabel('epoch')
             plt.ylabel('SSE')
-            # plt.legend()
             plt.yscale('log')
             plt.xscale('log')
-            # plt.show()
             plt.title(title_name)
             plt.savefig('figure_part1/' + figname)
             plt.close(fig)
         else:
             fig = plt.figure()
             plt.plot(np.arange(0, error.shape[0]), error)
-            # plt.plot(np.arange(0, error_valid.shape[0]), error_valid, label='validation error')
             plt.xlabel('epoch')
             plt.ylabel('SSE')
             # plt.legend()
-            plt.yscale('log')
-            plt.xscale('log')
-            # plt.show()
+            # plt.yscale('log')
+            # plt.xscale('log')
             plt.title(title_name)
             plt.savefig('figure_part1/' + figname)
             plt.close(fig)
@@ -212,8 +207,8 @@ def main():
 
     regularization = 0
     epsilon = 0.5
-    # lr_mat = [1, 0, 1e-3, 1e-6, 1e-9, 1e-12, 1e-15]
-    lr_mat = [1]
+    lr_mat = [1, 0, 1e-3, 1e-6, 1e-9, 1e-15]
+    # lr_mat = [1, 1e-15]
 
     for j in range(len(lr_mat)):
         lr = lr_mat[j]
@@ -225,7 +220,6 @@ def main():
 
         linear_regression.error_graph('error_train_lr{}.png'.format(lr), error_train, flag_div, 'Training SSE')
         linear_regression.error_graph('error_valid_lr{}.png'.format(lr), error_valid, flag_div, 'Validating SSE')
-        # linear_regression.error_graph('gradient_valid_lr{}.png'.format(lr), norm_gradient_ref, flag_div, 'L2 norm Gradient')
 
         y_test = linear_regression.predict(x_test, weight)
 
