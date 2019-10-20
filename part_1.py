@@ -258,14 +258,19 @@ if __name__ == '__main__':
     x_train, y_train, x_min, x_max = feature_eng.train('PA1_train.csv')
     x_valid, y_valid_true = feature_eng.valid('PA1_dev.csv', x_min, x_max)
     x_test = feature_eng.predict('PA1_test.csv', x_min, x_max)
-
+    
+    features = x_min.index
+    features = features[:-1]
 
     regularization = 0
     epsilon = 0.5
-    lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7] #, 1e-6, 1e-7
-    #lr_mat = [1e-1, 1e-5]
+    lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7] 
+    lr_mat_conv = copy(lr_m)
+
     dict_sse = {} 
     dict_pred = {}
+    df_weight = pd.DataFrame(index = features, columns = lr_mat)
+    df_sse = pd.DataFrame(index=lr_mat, columns = ["Train SSE", "Validation SSE", "Epochs for conergence"])
 
     for j in range(len(lr_mat)):
         lr = lr_mat[j]
@@ -279,6 +284,10 @@ if __name__ == '__main__':
         
         y_test = linear_regression.predict(x_test, weight, x_min.loc['price'], x_max.loc['price'])
         
+        df_weight.loc[:, lr] = weight
+        
+        if flag_div==True:
+            lr_mat_conv.remove(lr)
 
         if flag_div == False: 
             y_valid_pred = linear_regression.predict(x_valid, weight, x_min.loc['price'], x_max.loc['price'])
@@ -287,8 +296,23 @@ if __name__ == '__main__':
             dict_pred[lr] = diff
 
             dict_sse[lr] = error_valid_normalize
+            
+            
+            
+            df_sse.loc[lr, "Train SSE"] = error_train_normalize[-1]
+            df_sse.loc[lr, "Validation SSE"] = error_valid_normalize[-1]
+            df_sse.loc[lr, "Epochs for conergence"] = epoch
 
     linear_regression.plot_sse_epoch(dict_sse)
 
     linear_regression.plot_box_lr(dict_pred)
+    
+    df_weight = df_weight[lr_mat_conv]
+    print("Weights for various learning rates, converged conditions:")
+    print(df_weight)
+    df_weight.to_csv("figure_part1/df_weight.csv")
+    
+    print("SSE of converged conditions:")
+    print(df_sse)
+    df_sse.to_csv("figure_part1/df_sse.csv")
         
