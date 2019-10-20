@@ -14,10 +14,9 @@ class LinearRegression:
     # Public method
     def train(self, x_train, y_train, lr, regularization, epsilon):
 
-        # weight = np.random.random_sample(x_train.shape[1])
-        weight = np.zeros(x_train.shape[1])
+        weight = np.random.random_sample(x_train.shape[1])
+        # weight = np.zeros(x_train.shape[1])
         weight_ref = weight
-        norm_gradient_ref = np.array([])
 
         error_train = self.__calc_error(x_train, y_train, weight)
         error_train_pre = error_train
@@ -49,7 +48,6 @@ class LinearRegression:
             error_train = np.append(error_train, _error_train)
 
             norm_gradient = np.sqrt(np.dot(gradient, gradient))  # Norm of the gradient
-            norm_gradient_ref = np.append(norm_gradient_ref, norm_gradient)
             #print(_error_train)
 
             # Save weight at each epoch for calculating validation error
@@ -71,7 +69,7 @@ class LinearRegression:
 
         weight_ref = np.reshape(weight_ref, (-1, x_train.shape[1]))
 
-        return weight, weight_ref, error_train, epoch, flag_div, norm_gradient_ref
+        return weight, weight_ref, error_train, epoch, flag_div
 
     def valid(self, x_valid, y_valid, weight_ref, epoch):
 
@@ -106,7 +104,7 @@ class LinearRegression:
             # plt.legend()
             plt.yscale('log')
             plt.xscale('log')
-            plt.show()
+            # plt.show()
             plt.title(title_name)
             plt.savefig('figure_part1/' + figname)
             plt.close(fig)
@@ -119,7 +117,7 @@ class LinearRegression:
             # plt.legend()
             plt.yscale('log')
             plt.xscale('log')
-            plt.show()
+            # plt.show()
             plt.title(title_name)
             plt.savefig('figure_part1/' + figname)
             plt.close(fig)
@@ -221,13 +219,13 @@ def main():
         lr = lr_mat[j]
         linear_regression = LinearRegression()
 
-        weight, weight_ref, error_train, epoch, flag_div, norm_gradient_ref = linear_regression.train(x_train, y_train, lr, regularization,
+        weight, weight_ref, error_train, epoch, flag_div = linear_regression.train(x_train, y_train, lr, regularization,
                                                                                    epsilon)
         error_valid = linear_regression.valid(x_valid, y_valid, weight_ref, epoch)
 
-        # linear_regression.error_graph('error_train_lr{}.png'.format(lr), error_train, flag_div, 'Training SSE')
-        # linear_regression.error_graph('error_valid_lr{}.png'.format(lr), error_valid, flag_div, 'Validating SSE')
-        linear_regression.error_graph('gradient_valid_lr{}.png'.format(lr), norm_gradient_ref, flag_div, 'L2 norm Gradient')
+        linear_regression.error_graph('error_train_lr{}.png'.format(lr), error_train, flag_div, 'Training SSE')
+        linear_regression.error_graph('error_valid_lr{}.png'.format(lr), error_valid, flag_div, 'Validating SSE')
+        # linear_regression.error_graph('gradient_valid_lr{}.png'.format(lr), norm_gradient_ref, flag_div, 'L2 norm Gradient')
 
         y_test = linear_regression.predict(x_test, weight)
 
