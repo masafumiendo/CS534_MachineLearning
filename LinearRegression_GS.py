@@ -14,7 +14,7 @@ class LinearRegression:
     # Public method
     def train(self, x_train, y_train, lr, regularization, epsilon):
 
-        #weight = np.random.random_sample(x_train.shape[1])
+        # weight = np.random.random_sample(x_train.shape[1])
         weight = np.zeros(x_train.shape[1])
         weight_ref = weight
 
@@ -23,7 +23,7 @@ class LinearRegression:
         error_train_pre = error_train
 
         epoch = 1
-        max_epoch = 1000
+        max_epoch = 10
         count = 0  # To check whether exploding
         flag_div = False
 
@@ -45,12 +45,12 @@ class LinearRegression:
             weight = weight - lr * gradient
 
             # Calculate training error
-            _error_train = self.__calc_error(x_train, y_train, weight)          # SSE
+            _error_train = self.__calc_error(x_train, y_train, weight)  # SSE
             _error_train_normalize = _error_train / x_train.shape[0]
             error_train_normalize = np.append(error_train_normalize, _error_train_normalize)
 
             norm_gradient = np.sqrt(np.dot(gradient, gradient))  # Norm of the gradient
-            #print(_error_train)
+            # print(_error_train)
 
             # Save weight at each epoch for calculating validation error
             weight_ref = np.append(weight_ref, weight)
@@ -66,7 +66,7 @@ class LinearRegression:
                 if count > 9:
                     flag_div = True
                 break
-            
+
             epoch += 1
 
         weight_ref = np.reshape(weight_ref, (-1, x_train.shape[1]))
@@ -82,7 +82,7 @@ class LinearRegression:
             _weight = weight_ref[i, :]
             error_valid[i] = self.__calc_error(x_valid, y_valid, _weight)
 
-        error_valid_normalize = error_valid # / x_valid.shape[0]
+        error_valid_normalize = error_valid  # / x_valid.shape[0]
         return error_valid_normalize
 
     def predict(self, x_test, weight, x_min, x_max):
@@ -93,32 +93,32 @@ class LinearRegression:
         for i in range(num):
             y_test[i] = self.__regression(x_test[i, :], weight)
             y_test[i] = (x_max - x_min) * y_test[i] + x_min  # Reverse the normalization
-         #   print("Predicted cost is $", y_test[i], ".")
+        #   print("Predicted cost is $", y_test[i], ".")
 
         return y_test
 
-    def error_graph(self, figname, error,  flag_div, title):
+    def error_graph(self, figname, error, flag_div, title):
 
-        if flag_div == True: 
+        if flag_div == True:
             fig = plt.figure()
             plt.plot(np.arange(0, error.shape[0]), error)
-            
+
             plt.xlabel('epoch')
             plt.ylabel('loss')
-           
+
             plt.yscale('log')
             plt.xscale('log')
             plt.title(str(title))
-            plt.savefig('figure_part2/' + figname, bbox_inches = "tight")
+            plt.savefig('figure_part1/' + figname)
             plt.close(fig)
-            
+
         else:
             fig = plt.figure()
             plt.plot(np.arange(0, error.shape[0]), error)
             plt.xlabel('epoch')
             plt.ylabel('loss')
             plt.title(str(title))
-            plt.savefig('figure_part2/' + figname, bbox_inches = "tight")
+            plt.savefig('figure_part1/' + figname)
             plt.close(fig)
 
     def __regression(self, x, weight):
@@ -140,36 +140,38 @@ class LinearRegression:
 
         return error
 
-    def plot_sse_epoch(self, dict_sse, title):
+    def plot_sse_epoch(self, dict_sse):
         fig = plt.figure()
-        for r in dict_sse:
-            plt.plot(dict_sse[r], label=str(r))
+        for _lr in dict_sse:
+            print(_lr, len(dict_sse[lr]))
+            plt.plot(dict_sse[_lr], label=str(_lr))
         plt.xlabel('epoch')
         plt.ylabel('SSE')
         plt.legend()
-        plt.yscale('log')
-        #plt.xscale('log')
-        #plt.show()
-        plt.savefig('figure_part2/{}_sse_epoch_reg.png'.format(title), bbox_inches = "tight")
+        # plt.yscale('log')
+        # plt.xscale('log')
+        # plt.show()
+        plt.savefig('figure_part1/sse_epoch_lr.png')
         plt.close(fig)
 
     def percent_diff(self, y_actual, y_pred):
-        percent_diff = 100*(np.abs(y_actual - y_pred)) / y_actual #absolute percent difference
+        percent_diff = 100 * (np.abs(y_actual - y_pred)) / y_actual  # absolute percent difference
         return percent_diff
-        
-    def plot_box_r(self, dict_error):
+
+    def plot_box_lr(self, dict_error):
         fig = plt.figure()
-        
-        # or backwards compatable    
+
+        # or backwards compatable
         labels, data = dict_error.keys(), dict_error.values()
-        
+
         plt.boxplot(data, showfliers=False)
-        plt.xticks(range(1, len(labels) + 1), labels)        
-        plt.xlabel('Regularization')
+        plt.xticks(range(1, len(labels) + 1), labels)
+        plt.xlabel('Learning Rate')
         plt.ylabel('Percent difference in price prediction')
-        #plt.show()
-        plt.savefig('figure_part2/percent_diff_boxplot.png', bbox_inches = "tight")
+        # plt.show()
+        plt.savefig('figure_part1/percent_diff_boxplot.png')
         plt.close(fig)
+
 
 class FeatureEngineering:
 
@@ -188,8 +190,8 @@ class FeatureEngineering:
 
         x_normalized = (x - x_min) / (x_max - x_min)
 
-       # x_id = df.loc[:, 'dummy']  # Dummy variable
-       # x_normalized = pd.concat([x_id, x_normalized], axis=1)  # Add dummy
+        x_id = df.loc[:, 'dummy']  # Dummy variable
+        x_normalized = pd.concat([x_id, x_normalized], axis=1)  # Add dummy
         y = x_normalized.loc[:, 'price']
         x_normalized = x_normalized.drop(['price'], axis=1)  # Remove price
 
@@ -209,8 +211,8 @@ class FeatureEngineering:
 
         x_normalized = (x - x_min) / (x_max - x_min)
 
-       # x_id = df.loc[:, 'dummy']
-       # x_normalized = pd.concat([x_id, x_normalized], axis=1)
+        x_id = df.loc[:, 'dummy']
+        x_normalized = pd.concat([x_id, x_normalized], axis=1)
 
         y = x_normalized.loc[:, 'price']
         x_normalized = x_normalized.drop(['price'], axis=1)  # Remove price
@@ -233,84 +235,91 @@ class FeatureEngineering:
         x = pd.concat([x_date, x], axis=1)
 
         x_normalized = (x - x_min) / (x_max - x_min)
-      #  x_id = df.loc[:, 'dummy']
-       # x_normalized = pd.concat([x_id, x_normalized], axis=1)
+        x_id = df.loc[:, 'dummy']
+        x_normalized = pd.concat([x_id, x_normalized], axis=1)
 
         x = x_normalized.values
 
         return x
 
-#def main():
 
+# def main():
 
 
 if __name__ == '__main__':
-    #main()
+    # main()
 
     feature_eng = FeatureEngineering()
 
-#    x_train, y_train, x_min, x_max = feature_eng.train('C:\Fall 2019\CS534_MachineLearning\PA1_train.csv')
-#    x_valid, y_valid = feature_eng.valid('C:\Fall 2019\CS534_MachineLearning\PA1_dev.csv', x_min, x_max)
-#    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv', x_min, x_max)
+    #    x_train, y_train, x_min, x_max = feature_eng.train('C:\Fall 2019\CS534_MachineLearning\PA1_train.csv')
+    #    x_valid, y_valid = feature_eng.valid('C:\Fall 2019\CS534_MachineLearning\PA1_dev.csv', x_min, x_max)
+    #    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv', x_min, x_max)
 
     x_train, y_train, x_min, x_max = feature_eng.train('PA1_train.csv')
     x_valid, y_valid_true = feature_eng.valid('PA1_dev.csv', x_min, x_max)
     x_test = feature_eng.predict('PA1_test.csv', x_min, x_max)
 
-
-    regularization = [0, 1e-3, 1e-2, 1e-1, 1, 10, 100]
+    # regularization = 0
     epsilon = 0.5
-    lr = 1e-5
-    
-    features = x_min.index
-    features = features[:-1]
-    
-    dict_valid_sse = {} 
-    dict_train_sse = {}
+    lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7]
+    reg_mat = [100, 10, 1, 1e-1, 1e-2, 1e-3, 0]
+    dict_sse = {}
     dict_pred = {}
-    df_weight = pd.DataFrame(index = features, columns = regularization)
-    df_sse = pd.DataFrame(index=regularization, columns = ["Train SSE", "Validation SSE"])
 
-    for r in regularization:
-        print(r)
-        linear_regression = LinearRegression()
+    candidates = np.array([])
+    candidates_weight = np.array([])
 
-        weight, weight_ref, error_train_normalize, epoch, flag_div = linear_regression.train(x_train, y_train, lr, r, epsilon)
-        error_valid_normalize = linear_regression.valid(x_valid, y_valid_true, weight_ref, epoch)
+    for i in range(len(reg_mat)):
+        regularization = reg_mat[i]
+        for j in range(len(lr_mat)):
+            lr = lr_mat[j]
+            linear_regression = LinearRegression()
 
-        linear_regression.error_graph('train_error_reg{}.png'.format(r), error_train_normalize, flag_div, "Training SSE")
-        linear_regression.error_graph('valid_error_reg{}.png'.format(r), error_valid_normalize, flag_div, "Validation SSE")
-        
-        y_test = linear_regression.predict(x_test, weight, x_min.loc['price'], x_max.loc['price'])
-        
-        df_weight.loc[:, r] = weight
-        df_sse.loc[r, "Train SSE"] = error_train_normalize[-1]
-        df_sse.loc[r, "Validation SSE"] = error_valid_normalize[-1]
-        
-        if flag_div == False: 
-            y_valid_pred = linear_regression.predict(x_valid, weight, x_min.loc['price'], x_max.loc['price'])
-            y_valid_true = (x_max.price - x_min.price) * y_valid_true + x_min.price
-            diff = linear_regression.percent_diff(y_valid_true, y_valid_pred)
-            dict_pred[r] = diff
+            weight, weight_ref, error_train_normalize, epoch, flag_div = linear_regression.train(x_train, y_train, lr, regularization, epsilon)
+            error_valid_normalize = linear_regression.valid(x_valid, y_valid_true, weight_ref, epoch)
 
-            dict_valid_sse[r] = error_valid_normalize
-            dict_train_sse[r] = error_train_normalize
-            
-            if r == 0:
-                with open("y_test.txt") as f:
-                    for pred in y_test:
-                        f.write(pred)
-                        
-    linear_regression.plot_sse_epoch(dict_train_sse, "Train")
-    linear_regression.plot_sse_epoch(dict_valid_sse, "Validation")
+            print("validation error -> ", error_valid_normalize[-1], ", learning rate -> ", lr, ", regularization -> ", regularization, ", divergence -> ", flag_div)
+            print("weight ->", weight)
 
-    linear_regression.plot_box_r(dict_pred)
-    
-    print("Weights for various regularization parameters:")
-    print(df_weight)
-    df_weight.to_csv("figure_part2/df_weight_part2.csv")
-    
-    print("SSE:")
-    print(df_sse)
-    df_sse.to_csv("figure_part2/df_sse_part2.csv")
-        
+            candidate = np.array([error_valid_normalize[-1], lr, regularization])
+            candidates_weight = np.append(candidates_weight, weight)
+
+            candidates = np.append(candidates, candidate)
+
+            condition = str(lr) + "_" + str(regularization)
+
+            linear_regression.error_graph('train_error_lr{}.png'.format(condition), error_train_normalize, flag_div,
+                                          "Training SSE")
+            linear_regression.error_graph('valid_error_lr{}.png'.format(condition), error_valid_normalize, flag_div,
+                                          "Validation SSE")
+
+            y_test = linear_regression.predict(x_test, weight, x_min.loc['price'], x_max.loc['price'])
+
+            if flag_div == False:
+                y_valid_pred = linear_regression.predict(x_valid, weight, x_min.loc['price'], x_max.loc['price'])
+                y_valid_true = (x_max.price - x_min.price) * y_valid_true + x_min.price
+                diff = linear_regression.percent_diff(y_valid_true, y_valid_pred)
+                dict_pred[lr] = diff
+
+                dict_sse[lr] = error_valid_normalize
+
+        #linear_regression.plot_sse_epoch(dict_sse)
+
+        #linear_regression.plot_box_lr(dict_pred)
+
+    candidates = np.reshape(candidates, (len(lr_mat)*len(reg_mat), 3))
+    candidates_weight = np.reshape(candidates_weight, (-1, x_train.shape[1]))
+    best_condition_index = candidates[:, 0].argmin()
+    best_condition = candidates[best_condition_index, :]
+
+    best_weight = candidates_weight[best_condition_index, :]
+    best_lr = best_condition[1]
+    best_regularization = best_condition[2]
+
+    print("best learning rate -> ", best_lr, ", best regularization -> ", best_regularization)
+    print("best weight -> ", best_weight)
+
+    y_test = linear_regression.predict(x_test, best_weight, x_min.loc['price'], x_max.loc['price'])
+    y_test = y_test.reshape(-1, 1)
+    y_test = pd.DataFrame(y_test)
+    y_test.to_csv('result.csv')

@@ -4,7 +4,7 @@ Group members: Masafumi Endo, Dilan Senaratne, Morgan Mayer
 ##########################
 Part 0 run with: python part_0.py
 
-The part_0.py file can be run and will output frequency distribution bar plots (png format) for each of the categorical features in the 'dist/' folder. It shows the percentage occurance in the train set for each catagory in each feature. The pandas DataFrame, df_num shows the mean, standard deviation, minimum, and maximum for each numerical feature. The data sets are scaled according to the Class, FeatureEngineering() which is in the file. It scales the train set, validation set, and test set based on the respective minimum and maximum values in the train set. The array of scaled train data are x_train, y_train with min and max being x_min and x_max respectively which are a pandas.Series object with feature index.
+The part_0.py file can be run and will output frequency distribution bar plots (png format) for each of the categorical features in the 'dist/' folder. It shows the percentage occurance in the train set for each catagory in each feature. The pandas DataFrame, df_num shows the mean, standard deviation, minimum, and maximum for each numerical feature. The data sets are scaled according to the Class, FeatureEngineering() which is in the file. It scales the train set, validation set, and test set based on the respective minimum and maximum values in the train set. The array of scaled train data are x_train, y_train with min and max being x_min and x_max respectively which are a pandas.Series object with feature index. The numeric feature statistics are output to df_num.csv.
 
 ##########################
 Part 1 run with: python part_1.py

@@ -23,7 +23,7 @@ class LinearRegression:
         error_train_pre = error_train
 
         epoch = 1
-        max_epoch = 100
+        max_epoch = 1000
         count = 0  # To check whether exploding
         flag_div = False
 
@@ -260,12 +260,12 @@ if __name__ == '__main__':
     x_test = feature_eng.predict('PA1_test.csv', x_min, x_max)
     
     features = x_min.index
-    features = features[:-1]
+    features = ["dummy", *features[:-1]]
 
     regularization = 0
     epsilon = 0.5
     lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7] 
-    lr_mat_conv = copy(lr_m)
+    lr_mat_conv = lr_mat.copy()
 
     dict_sse = {} 
     dict_pred = {}
@@ -297,8 +297,6 @@ if __name__ == '__main__':
 
             dict_sse[lr] = error_valid_normalize
             
-            
-            
             df_sse.loc[lr, "Train SSE"] = error_train_normalize[-1]
             df_sse.loc[lr, "Validation SSE"] = error_valid_normalize[-1]
             df_sse.loc[lr, "Epochs for conergence"] = epoch
@@ -308,6 +306,7 @@ if __name__ == '__main__':
     linear_regression.plot_box_lr(dict_pred)
     
     df_weight = df_weight[lr_mat_conv]
+    df_weight = df_weight.dropna()
     print("Weights for various learning rates, converged conditions:")
     print(df_weight)
     df_weight.to_csv("figure_part1/df_weight.csv")
