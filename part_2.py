@@ -19,7 +19,7 @@ class LinearRegression:
         weight_ref = weight
 
         error_train = self.__calc_error(x_train, y_train, weight)
-        error_train_normalize = error_train / x_train.shape[0]
+        error_train_normalize = error_train # / x_train.shape[0]
         error_train_pre = error_train
 
         epoch = 1
@@ -46,7 +46,7 @@ class LinearRegression:
 
             # Calculate training error
             _error_train = self.__calc_error(x_train, y_train, weight)          # SSE
-            _error_train_normalize = _error_train / x_train.shape[0]
+            _error_train_normalize = _error_train # / x_train.shape[0]
             error_train_normalize = np.append(error_train_normalize, _error_train_normalize)
 
             norm_gradient = np.sqrt(np.dot(gradient, gradient))  # Norm of the gradient
@@ -240,12 +240,7 @@ class FeatureEngineering:
 
         return x
 
-#def main():
-
-
-
 if __name__ == '__main__':
-    #main()
 
     feature_eng = FeatureEngineering()
 
@@ -254,7 +249,7 @@ if __name__ == '__main__':
 #    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv', x_min, x_max)
 
     x_train, y_train, x_min, x_max = feature_eng.train('PA1_train.csv')
-    x_valid, y_valid_true = feature_eng.valid('PA1_dev.csv', x_min, x_max)
+    x_valid, y_valid = feature_eng.valid('PA1_dev.csv', x_min, x_max)
     x_test = feature_eng.predict('PA1_test.csv', x_min, x_max)
 
 
@@ -272,11 +267,11 @@ if __name__ == '__main__':
     df_sse = pd.DataFrame(index=regularization, columns = ["Train SSE", "Validation SSE"])
 
     for r in regularization:
-        print(r)
+
         linear_regression = LinearRegression()
 
         weight, weight_ref, error_train_normalize, epoch, flag_div = linear_regression.train(x_train, y_train, lr, r, epsilon)
-        error_valid_normalize = linear_regression.valid(x_valid, y_valid_true, weight_ref, epoch)
+        error_valid_normalize = linear_regression.valid(x_valid, y_valid, weight_ref, epoch)
 
         linear_regression.error_graph('train_error_reg{}.png'.format(r), error_train_normalize, flag_div, "Training SSE")
         linear_regression.error_graph('valid_error_reg{}.png'.format(r), error_valid_normalize, flag_div, "Validation SSE")
@@ -289,26 +284,27 @@ if __name__ == '__main__':
         
         if flag_div == False: 
             y_valid_pred = linear_regression.predict(x_valid, weight, x_min.loc['price'], x_max.loc['price'])
-            y_valid_true = (x_max.price - x_min.price) * y_valid_true + x_min.price
+            y_valid_true = (x_max.price - x_min.price) * y_valid + x_min.price
             diff = linear_regression.percent_diff(y_valid_true, y_valid_pred)
             dict_pred[r] = diff
 
             dict_valid_sse[r] = error_valid_normalize
             dict_train_sse[r] = error_train_normalize
-            
-            if r == 0:
-                with open("y_test.txt") as f:
-                    for pred in y_test:
-                        f.write(pred)
                         
     linear_regression.plot_sse_epoch(dict_train_sse, "Train")
     linear_regression.plot_sse_epoch(dict_valid_sse, "Validation")
 
     linear_regression.plot_box_r(dict_pred)
     
+    
     print("Weights for various regularization parameters:")
     print(df_weight)
     df_weight.to_csv("figure_part2/df_weight_part2.csv")
+    
+    df_weight_2d = df_weight[[10, 1e-2, 0]]
+    print("Weights for various regularization parameters:")
+    print(df_weight_2d)
+    df_weight.to_csv("figure_part2/df_weight_part2d_cases.csv")
     
     print("SSE:")
     print(df_sse)

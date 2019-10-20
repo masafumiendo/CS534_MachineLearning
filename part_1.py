@@ -19,7 +19,7 @@ class LinearRegression:
         weight_ref = weight
 
         error_train = self.__calc_error(x_train, y_train, weight)
-        error_train_normalize = error_train / x_train.shape[0]
+        error_train_normalize = error_train # / x_train.shape[0]
         error_train_pre = error_train
 
         epoch = 1
@@ -46,7 +46,7 @@ class LinearRegression:
 
             # Calculate training error
             _error_train = self.__calc_error(x_train, y_train, weight)          # SSE
-            _error_train_normalize = _error_train / x_train.shape[0]
+            _error_train_normalize = _error_train # / x_train.shape[0]
             error_train_normalize = np.append(error_train_normalize, _error_train_normalize)
 
             norm_gradient = np.sqrt(np.dot(gradient, gradient))  # Norm of the gradient
@@ -109,7 +109,7 @@ class LinearRegression:
             plt.yscale('log')
             plt.xscale('log')
             plt.title(str(title))
-            plt.savefig('figure_part1/' + figname)
+            plt.savefig('figure_part1/' + figname, bbox_inches = "tight")
             plt.close(fig)
             
         else:
@@ -118,7 +118,7 @@ class LinearRegression:
             plt.xlabel('epoch')
             plt.ylabel('loss')
             plt.title(str(title))
-            plt.savefig('figure_part1/' + figname)
+            plt.savefig('figure_part1/' + figname, bbox_inches = "tight")
             plt.close(fig)
 
     def __regression(self, x, weight):
@@ -151,7 +151,7 @@ class LinearRegression:
         #plt.yscale('log')
         #plt.xscale('log')
         #plt.show()
-        plt.savefig('figure_part1/sse_epoch_lr.png')
+        plt.savefig('figure_part1/sse_epoch_lr.png', bbox_inches = "tight")
         plt.close(fig)
 
     def percent_diff(self, y_actual, y_pred):
@@ -169,7 +169,7 @@ class LinearRegression:
         plt.xlabel('Learning Rate')
         plt.ylabel('Percent difference in price prediction')
         #plt.show()
-        plt.savefig('figure_part1/percent_diff_boxplot.png')
+        plt.savefig('figure_part1/percent_diff_boxplot.png', bbox_inches = "tight")
         plt.close(fig)
 
 
@@ -256,7 +256,7 @@ if __name__ == '__main__':
 #    x_test = feature_eng.predict('C:\Fall 2019\CS534_MachineLearning\PA1_test.csv', x_min, x_max)
 
     x_train, y_train, x_min, x_max = feature_eng.train('PA1_train.csv')
-    x_valid, y_valid_true = feature_eng.valid('PA1_dev.csv', x_min, x_max)
+    x_valid, y_valid = feature_eng.valid('PA1_dev.csv', x_min, x_max)
     x_test = feature_eng.predict('PA1_test.csv', x_min, x_max)
     
     features = x_min.index
@@ -264,7 +264,7 @@ if __name__ == '__main__':
 
     regularization = 0
     epsilon = 0.5
-    lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7] 
+    lr_mat = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5,  1e-6, 1e-7]
     lr_mat_conv = lr_mat.copy()
 
     dict_sse = {} 
@@ -277,7 +277,7 @@ if __name__ == '__main__':
         linear_regression = LinearRegression()
 
         weight, weight_ref, error_train_normalize, epoch, flag_div = linear_regression.train(x_train, y_train, lr, regularization, epsilon)
-        error_valid_normalize = linear_regression.valid(x_valid, y_valid_true, weight_ref, epoch)
+        error_valid_normalize = linear_regression.valid(x_valid, y_valid, weight_ref, epoch)
 
         linear_regression.error_graph('train_error_lr{}.png'.format(lr), error_train_normalize, flag_div, "Training SSE")
         linear_regression.error_graph('valid_error_lr{}.png'.format(lr), error_valid_normalize, flag_div, "Validation SSE")
@@ -291,7 +291,7 @@ if __name__ == '__main__':
 
         if flag_div == False: 
             y_valid_pred = linear_regression.predict(x_valid, weight, x_min.loc['price'], x_max.loc['price'])
-            y_valid_true = (x_max.price - x_min.price) * y_valid_true + x_min.price
+            y_valid_true = (x_max.price - x_min.price) * y_valid + x_min.price
             diff = linear_regression.percent_diff(y_valid_true, y_valid_pred)
             dict_pred[lr] = diff
 
@@ -309,9 +309,10 @@ if __name__ == '__main__':
     df_weight = df_weight.dropna()
     print("Weights for various learning rates, converged conditions:")
     print(df_weight)
-    df_weight.to_csv("figure_part1/df_weight.csv")
+    df_weight.to_csv("figure_part1/df_weight_part1.csv")
     
+    df_sse = df_sse.dropna()
     print("SSE of converged conditions:")
     print(df_sse)
-    df_sse.to_csv("figure_part1/df_sse.csv")
+    df_sse.to_csv("figure_part1/df_sse_part1.csv")
         
