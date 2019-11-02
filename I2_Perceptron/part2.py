@@ -214,7 +214,7 @@ def main():
 
     perceptron = AvPerceptron(x_train, y_train, x_valid, y_valid, iters=15)
     train = perceptron.train()
-    y_test, max_acc, max_acc_index = perceptron.predict(x_valid)
+    y_test, max_acc, max_acc_index = perceptron.predict(x_test)
     y_test = pd.DataFrame(y_test)
     summary = pd.Series({'best accuracy': max_acc, 'best iteration': max_acc_index + 1})
 
