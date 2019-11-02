@@ -103,8 +103,6 @@ class AvPerceptron:
 
         if option == "both":
 
-            print(np.arange(1, len(train)+1))
-
             fig = plt.figure()
             plt.plot(np.arange(1, len(train)+1), train, label="training accuracy")
             plt.plot(np.arange(1, len(valid)+1), valid, label="validation accuracy")
