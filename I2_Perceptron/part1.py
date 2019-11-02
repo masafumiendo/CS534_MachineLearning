@@ -215,7 +215,7 @@ def main():
     y_test = pd.DataFrame(y_test)
     summary = pd.Series({'best accuracy': max_acc, 'best iteration': max_acc_index+1})
 
-    y_test.to_csv('oplabel.csv')
+    y_test.to_csv('oplabel.csv', header=False, index=False)
     summary.to_csv('summary_oplabel.csv')
 
 if __name__ == '__main__':
