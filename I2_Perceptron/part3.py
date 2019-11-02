@@ -127,12 +127,12 @@ class KernalPerceptron:
 
             plt.xlabel("iteration")
             plt.ylabel("accuracy")
-            plt.ylim((0.9, 1.0))
+            # plt.ylim((0.9, 1.05))
 
             plt.title("")
             plt.legend()
 
-            plt.savefig('part3/' + figname)
+            plt.savefig('fig/part3/' + figname)
             plt.close(fig)
 
         elif option == "separate":
@@ -146,7 +146,7 @@ class KernalPerceptron:
             plt.title("")
             plt.legend()
 
-            plt.savefig('part3/training_' + figname)
+            plt.savefig('fig/part3/training_' + figname)
             plt.close(fig)
 
             fig = plt.figure()
@@ -158,19 +158,19 @@ class KernalPerceptron:
             plt.title("")
             plt.legend()
 
-            plt.savefig('part3/validation_' + figname)
+            plt.savefig('fig/part3/validation_' + figname)
             plt.close(fig)
 
     def p_graph(self, max_accuracy_list, p_mat, figname):
 
         fig = plt.figure()
-        plt.plot(np.arange(0, len(p_mat)), max_accuracy_list, label="accuracy vs p")
+        plt.plot(np.arange(1, len(p_mat)+1), max_accuracy_list, label="accuracy vs p")
         plt.xlabel("p values")
         plt.ylabel("best accuracy")
         plt.title("")
         plt.legend()
 
-        plt.savefig('part3/' + figname)
+        plt.savefig('fig/part3/' + figname)
         plt.close(fig)
 
 class Preprocessing:
@@ -246,9 +246,11 @@ def main():
 
     y_test = kernalperceptron.predict(x_test, max_alpha, max_p)
     y_test = pd.DataFrame(y_test)
-    y_test.to_csv('kplabel.csv',header=False)
+    y_test.to_csv('kplabel.csv',header=False, index=False)
+    summary = pd.Series({'best accuracy': max_accuracy_list, 'best iteration': max_itr_list, 'best p': max_p, 'best alpha': max_alpha})
 
     kernalperceptron.p_graph(max_accuracy_list, p_mat, "Accuracy_p")
+    summary.to_csv('summary_kplabel.csv')
 
 if __name__ == '__main__':
     main()
