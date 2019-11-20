@@ -18,11 +18,12 @@ class DecisionTree:
         self.autoencoded_features = list(df_train.columns)[:-1]
         self.features = list(np.unique([str(feature).split("_")[0] for feature in self.autoencoded_features]))
     
-    def decisiontree(self, df, depth=0):
+    def make_decisiontree(self, df, depth=0):
         
-        if self.check_pure(df) == True or depth >= self.max_depth:
-            return self.classify_leaf(df)
-        
+        if self.check_pure(df) == True or depth == self.max_depth:
+#            print("leaf")
+            return self.classify_leaf(df) #returns 0 or 1 for classification
+            
         else:
             split_on = self.split_node(df)
             tree = {str(split_on): []}
@@ -30,11 +31,11 @@ class DecisionTree:
             df_0 = df[df.eval(split_on) == 0]
             df_1 = df[df.eval(split_on) == 1]
             
-            print(depth)
             depth += 1
+            print(depth)
             
-            ans_0 = self.decisiontree(df_0, depth)
-            ans_1 = self.decisiontree(df_1, depth)
+            ans_0 = self.make_decisiontree(df_0, depth)
+            ans_1 = self.make_decisiontree(df_1, depth)
             
             tree[str(split_on)].append(ans_0)
             tree[str(split_on)].append(ans_1)
@@ -52,9 +53,9 @@ class DecisionTree:
         n_1 = sum(df["Class"])
         n_0 = len(df) - n_1
         if n_1 > n_0:
-            return 1
+            return 1 # return poisonous
         else:
-            return 0
+            return 0 # return edible
         
     def split_node(self, df):
         try:
@@ -77,7 +78,7 @@ class DecisionTree:
                 U_AR = self.get_uncertainty(df[df.eval(feature) == 1])
                 benefit = U_A - (p_left*U_AL) - (p_right * U_AR)
             except: # if all of branch has 0 or 1 for feature, so no benefit splitting
-                benefit = 0
+                benefit = np.NaN # should not happen bc of check_pure function
             return benefit
         
     def get_uncertainty(self, df):
@@ -85,8 +86,11 @@ class DecisionTree:
         n_1 = sum(df["Class"])
         n_0 = len(df) - n_1
         n_total = len(df)
-#        print(n_total)
-        U = 1 - (float(n_1/n_total))**2 - (float(n_0/n_total))**2
+
+        try:
+            U = 1 - (float(n_1/n_total))**2 - (float(n_0/n_total))**2
+        except:
+            U = np.NaN
         return U
     
     def get_probability(self, df, feature, feature_result):
@@ -99,7 +103,10 @@ class DecisionTree:
         branch_n_1 = sum(branch["Class"])
         branch_n_0 = len(branch) - branch_n_1
         
-        probability = (branch_n_1 + branch_n_0)/(n_1 + n_0)
+        try:
+            probability = (branch_n_1 + branch_n_0)/(n_1 + n_0)
+        except:
+            probability = np.NaN
         return probability
     
 #    def valid_accuracy(self):
@@ -109,7 +116,7 @@ class DecisionTree:
 #            
 #            for level in range(self.tree_model):
 #                if df_example.eval(self.tree_model[level]) 
-#    
+    
     def predict(self, x_test, tree):
         y_predict = 1
         
@@ -127,16 +134,21 @@ if __name__ == "__main__":
     df_valid.columns = [col.replace("-", "").replace("class", "Class").replace("?", "unk") for col in df_valid.columns]
     df_test.columns = [col.replace("-", "").replace("?", "unk") for col in df_test.columns]
     
-    # train
-    y_train = df_train["Class"].copy()
-    x_train = df_train.drop("Class", axis=1)
     
-    # validation
-    y_valid = df_valid["Class"].copy()
-    x_valid = df_valid.drop("Class", axis=1)
+     #remove columns where value is same for all molecules
+    nunique = df_train.apply(pd.Series.nunique)
+    cols_to_drop = list(nunique[nunique == 1].index)
+    df_train = df_train.drop(cols_to_drop, axis=1)
+#    # train
+#    y_train = df_train["Class"].copy()
+#    x_train = df_train.drop("Class", axis=1)
+#    
+#    # validation
+#    y_valid = df_valid["Class"].copy()
+#    x_valid = df_valid.drop("Class", axis=1)
 
-    max_depth = 3
+    max_depth = 5
     DT = DecisionTree(df_train, max_depth)
-    model_tree = DT.decisiontree(df_train)
+    model_tree = DT.make_decisiontree(df_train)
 
     #predict test set
