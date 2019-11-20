@@ -15,13 +15,13 @@ class DecisionTree:
     def __init__(self, df_train, max_depth):
     
         self.max_depth = max_depth
-        self.autoencoded_features = list(df_train.columns)[:-1]
-        self.features = list(np.unique([str(feature).split("_")[0] for feature in self.autoencoded_features]))
-    
+#        self.autoencoded_features = list(df_train.columns)[:-1]
+#        self.features = list(np.unique([str(feature).split("_")[0] for feature in self.autoencoded_features]))
+        self.features = list(df_train.columns)[:-1]
+        
     def make_decisiontree(self, df, depth=0):
         
         if self.check_pure(df) == True or depth == self.max_depth:
-#            print("leaf")
             return self.classify_leaf(df) #returns 0 or 1 for classification
             
         else:
@@ -30,9 +30,10 @@ class DecisionTree:
             
             df_0 = df[df.eval(split_on) == 0]
             df_1 = df[df.eval(split_on) == 1]
+            print(len(df_0), len(df_1))
             
             depth += 1
-            print(depth)
+#            print(depth)
             
             ans_0 = self.make_decisiontree(df_0, depth)
             ans_1 = self.make_decisiontree(df_1, depth)
@@ -58,11 +59,11 @@ class DecisionTree:
             return 0 # return edible
         
     def split_node(self, df):
-        try:
-            benefits = [self.get_benefit(df, feature) for feature in self.autoencoded_features]
-            split_on = self.autoencoded_features[np.argmax(benefits)] # split on feature with max benefit value
-        except:
-            split_on = 0
+
+        benefits = [self.get_benefit(df, feature) for feature in self.features]
+        split_on = self.features[np.argmax(benefits)] # split on feature with max benefit value
+        print(benefits[0:10])
+        print(split_on)
         return split_on
     
     def get_benefit(self, df, feature):
@@ -78,25 +79,25 @@ class DecisionTree:
                 U_AR = self.get_uncertainty(df[df.eval(feature) == 1])
                 benefit = U_A - (p_left*U_AL) - (p_right * U_AR)
             except: # if all of branch has 0 or 1 for feature, so no benefit splitting
-                benefit = np.NaN # should not happen bc of check_pure function
+                benefit = -100 # np.NaN # if empty dataframe
             return benefit
         
     def get_uncertainty(self, df):
         
-        n_1 = sum(df["Class"])
-        n_0 = len(df) - n_1
+        n_1 = sum(df["Class"]) # number poisonous
+        n_0 = len(df) - n_1 # number edible
         n_total = len(df)
 
         try:
             U = 1 - (float(n_1/n_total))**2 - (float(n_0/n_total))**2
         except:
-            U = np.NaN
+            U = np.NaN # if len(df) == 0
         return U
     
-    def get_probability(self, df, feature, feature_result):
+    def get_probability(self, df, feature, feature_result): 
         
-        n_1 = sum(df["Class"])
-        n_0 = len(df) - n_1
+        n_1 = sum(df["Class"]) # number poisonous
+        n_0 = len(df) - n_1 # remainder are edible
         
         #branch is df of feature = 0 or 1 (result)
         branch = df[df.eval(feature) != feature_result]
@@ -106,24 +107,26 @@ class DecisionTree:
         try:
             probability = (branch_n_1 + branch_n_0)/(n_1 + n_0)
         except:
-            probability = np.NaN
+            probability = np.NaN # if len(df) is 0
+            
         return probability
-    
-    def valid_accuracy(self, df_valid, model_tree):
-        y_labels = df_valid["Class"].to_list()
+     
+    def accuracy(self, df, model_tree): # predicts accuracy of labeled set given model tree
+        y_labels = df["Class"].to_list()
         predictions = []
-        for i, example in enumerate(df_valid.iterrows()):
-            df_ex = df_valid[df_valid.index == i].drop("Class", axis = 1)
-            y_pred = self.predict(df_ex, model_tree)
-            predictions.append(y_pred)
-        correct = sum([(predictions[i] == y_labels[i]) for i in predictions])
-        accuracy = correct / len(predictions)
+        for i, example in enumerate(df.iterrows()):
+            df_ex = df[df.index == i].drop("Class", axis = 1) #single example as df
+            y_pred = self.predict(df_ex, model_tree) #prediction of example using model dec tree
+            predictions.append(y_pred) 
+        correct = sum([(predictions[i] == y_labels[i]) for i in predictions]) #total correct for set
+        accuracy = correct / len(predictions) # accuracy as percent correct
         return accuracy
     
-    def predict(self, x_test, y_predict):
+    def predict(self, x_test, y_predict): # predicts poisonous/edible for single example
         
         if type(y_predict) == int:
-            print("y_predict:", y_predict)
+#            print("y_predict:", y_predict)
+            pass
           
         elif type(y_predict) == dict:
             feature = list(y_predict.keys())[0]
@@ -148,11 +151,11 @@ if __name__ == "__main__":
     df_test.columns = [col.replace("-", "").replace("?", "unk") for col in df_test.columns]
     
     # remove columns where value is same for all molecules
-    nunique = df_train.apply(pd.Series.nunique)
-    cols_to_drop = list(nunique[nunique == 1].index)
-    df_train = df_train.drop(cols_to_drop, axis=1)
-    df_valid = df_valid.drop(cols_to_drop, axis = 1)
-    df_test = df_test.drop(cols_to_drop, axis = 1)
+#    nunique = df_train.apply(pd.Series.nunique)
+#    cols_to_drop = list(nunique[nunique == 1].index)
+#    df_train = df_train.drop(cols_to_drop, axis=1)
+#    df_valid = df_valid.drop(cols_to_drop, axis = 1)
+#    df_test = df_test.drop(cols_to_drop, axis = 1)
 
     # make decision tree model
     max_depth = 5
@@ -164,5 +167,5 @@ if __name__ == "__main__":
     y_pred = DT.predict(x_test, model_tree)
     
     # validation accuracy
-    accuracy = DT.valid_accuracy(df_valid, model_tree)
+    valid_accuracy = DT.accuracy(df_valid, model_tree)
     
