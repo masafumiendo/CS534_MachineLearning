@@ -109,19 +109,32 @@ class DecisionTree:
             probability = np.NaN
         return probability
     
-#    def valid_accuracy(self):
-#        predictions = []
-#        for e, example in enumerate(self.x_valid.iterrows()):
-#            df_example = x_valid[x_valid.index == e]
-#            
-#            for level in range(self.tree_model):
-#                if df_example.eval(self.tree_model[level]) 
+    def valid_accuracy(self, df_valid, model_tree):
+        y_labels = df_valid["Class"].to_list()
+        predictions = []
+        for i, example in enumerate(df_valid.iterrows()):
+            df_ex = df_valid[df_valid.index == i].drop("Class", axis = 1)
+            y_pred = self.predict(df_ex, model_tree)
+            predictions.append(y_pred)
+        correct = sum([(predictions[i] == y_labels[i]) for i in predictions])
+        accuracy = correct / len(predictions)
+        return accuracy
     
-    def predict(self, x_test, tree):
-        y_predict = 1
+    def predict(self, x_test, y_predict):
+        
+        if type(y_predict) == int:
+            print("y_predict:", y_predict)
+          
+        elif type(y_predict) == dict:
+            feature = list(y_predict.keys())[0]
+            example_feature = x_test.eval(feature).values[0]
+            y_predict = y_predict[str(feature)][example_feature]
+            y_predict = self.predict(x_test, y_predict)
+            
+        else:
+            print("not int or dict")
         
         return y_predict
-        
 
 if __name__ == "__main__":
     
@@ -134,21 +147,22 @@ if __name__ == "__main__":
     df_valid.columns = [col.replace("-", "").replace("class", "Class").replace("?", "unk") for col in df_valid.columns]
     df_test.columns = [col.replace("-", "").replace("?", "unk") for col in df_test.columns]
     
-    
-     #remove columns where value is same for all molecules
+    # remove columns where value is same for all molecules
     nunique = df_train.apply(pd.Series.nunique)
     cols_to_drop = list(nunique[nunique == 1].index)
     df_train = df_train.drop(cols_to_drop, axis=1)
-#    # train
-#    y_train = df_train["Class"].copy()
-#    x_train = df_train.drop("Class", axis=1)
-#    
-#    # validation
-#    y_valid = df_valid["Class"].copy()
-#    x_valid = df_valid.drop("Class", axis=1)
+    df_valid = df_valid.drop(cols_to_drop, axis = 1)
+    df_test = df_test.drop(cols_to_drop, axis = 1)
 
+    # make decision tree model
     max_depth = 5
     DT = DecisionTree(df_train, max_depth)
     model_tree = DT.make_decisiontree(df_train)
 
-    #predict test set
+    # predict example
+    x_test = df_test[df_test.index == 78]
+    y_pred = DT.predict(x_test, model_tree)
+    
+    # validation accuracy
+    accuracy = DT.valid_accuracy(df_valid, model_tree)
+    
