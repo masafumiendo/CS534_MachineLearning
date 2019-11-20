@@ -12,15 +12,17 @@ from pprint import pprint
 
 class DecisionTree:
 
-    def __init__(self, df_train, max_depth):
+    def __init__(self, max_depth):
     
         self.max_depth = max_depth
 #        self.autoencoded_features = list(df_train.columns)[:-1]
 #        self.features = list(np.unique([str(feature).split("_")[0] for feature in self.autoencoded_features]))
-        self.features = list(df_train.columns)[:-1]
+#        self.features = list(df_train.columns)[:-1]
         
     def make_decisiontree(self, df, depth=0):
-        
+        if depth == 0:
+            self.features = list(df.columns)[:-1]
+            
         if self.check_pure(df) == True or depth == self.max_depth:
 #            print("check pure: ", self.check_pure(df))
 #            print("leaf at depth", depth)
@@ -185,7 +187,7 @@ if __name__ == "__main__":
 
     # make decision tree model
     max_depth = 2
-    DT = DecisionTree(df_train, max_depth)
+    DT = DecisionTree(max_depth)
     model_tree = DT.make_decisiontree(df_train)
 
     # predict example
@@ -196,18 +198,18 @@ if __name__ == "__main__":
     valid_accuracy = DT.accuracy(df_valid, model_tree)
     print(f"validation accuracy for max depth of {max_depth}:", valid_accuracy)
     
-    # plot train and validation accuracy for depths 1 -> 8
-    train_acc = []
-    valid_acc = []
-    for i in range(1, 9):
-        DT = DecisionTree(df_train, i)
-        model_tree = DT.make_decisiontree(df_train)
-        
-        train_accuracy = DT.accuracy(df_train, model_tree)
-        valid_accuracy = DT.accuracy(df_valid, model_tree)
-        
-        train_acc.append(train_accuracy)
-        valid_acc.append(valid_accuracy)
-        
-    DT.plot_train_valid_accuracy(train_acc, valid_acc)
-    
+#    # plot train and validation accuracy for depths 1 -> 8
+#    train_acc = []
+#    valid_acc = []
+#    for i in range(1, 9):
+#        DT = DecisionTree(df_train, i)
+#        model_tree = DT.make_decisiontree(df_train)
+#        
+#        train_accuracy = DT.accuracy(df_train, model_tree)
+#        valid_accuracy = DT.accuracy(df_valid, model_tree)
+#        
+#        train_acc.append(train_accuracy)
+#        valid_acc.append(valid_accuracy)
+#        
+#    DT.plot_train_valid_accuracy(train_acc, valid_acc)
+#    
