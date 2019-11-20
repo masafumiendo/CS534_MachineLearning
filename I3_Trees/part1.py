@@ -198,18 +198,18 @@ if __name__ == "__main__":
     valid_accuracy = DT.accuracy(df_valid, model_tree)
     print(f"validation accuracy for max depth of {max_depth}:", valid_accuracy)
     
-#    # plot train and validation accuracy for depths 1 -> 8
-#    train_acc = []
-#    valid_acc = []
-#    for i in range(1, 9):
-#        DT = DecisionTree(df_train, i)
-#        model_tree = DT.make_decisiontree(df_train)
-#        
-#        train_accuracy = DT.accuracy(df_train, model_tree)
-#        valid_accuracy = DT.accuracy(df_valid, model_tree)
-#        
-#        train_acc.append(train_accuracy)
-#        valid_acc.append(valid_accuracy)
-#        
-#    DT.plot_train_valid_accuracy(train_acc, valid_acc)
-#    
+    # plot train and validation accuracy for depths 1 -> 8
+    train_acc = []
+    valid_acc = []
+    for i in range(1, 9):
+        DT = DecisionTree(df_train, i)
+        model_tree = DT.make_decisiontree(df_train)
+        
+        train_accuracy = DT.accuracy(df_train, model_tree)
+        valid_accuracy = DT.accuracy(df_valid, model_tree)
+        
+        train_acc.append(train_accuracy)
+        valid_acc.append(valid_accuracy)
+        
+    DT.plot_train_valid_accuracy(train_acc, valid_acc)
+    
