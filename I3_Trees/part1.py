@@ -22,6 +22,8 @@ class DecisionTree:
     def make_decisiontree(self, df, depth=0):
         
         if self.check_pure(df) == True or depth == self.max_depth:
+#            print("check pure: ", self.check_pure(df))
+#            print("leaf at depth", depth)
             return self.classify_leaf(df) #returns 0 or 1 for classification
             
         else:
@@ -30,7 +32,7 @@ class DecisionTree:
             
             df_0 = df[df.eval(split_on) == 0]
             df_1 = df[df.eval(split_on) == 1]
-            print(len(df_0), len(df_1))
+#            print("length of df0 and df1:", len(df_0), len(df_1))
             
             depth += 1
 #            print(depth)
@@ -61,9 +63,10 @@ class DecisionTree:
     def split_node(self, df):
 
         benefits = [self.get_benefit(df, feature) for feature in self.features]
-        split_on = self.features[np.argmax(benefits)] # split on feature with max benefit value
-        print(benefits[0:10])
-        print(split_on)
+#        print("max benefit value:", np.nanmax(benefits))
+        split_on = self.features[np.nanargmax(benefits)] # split on feature with max benefit value
+#        print(benefits[0:10])
+#        print(split_on)
         return split_on
     
     def get_benefit(self, df, feature):
@@ -79,7 +82,7 @@ class DecisionTree:
                 U_AR = self.get_uncertainty(df[df.eval(feature) == 1])
                 benefit = U_A - (p_left*U_AL) - (p_right * U_AR)
             except: # if all of branch has 0 or 1 for feature, so no benefit splitting
-                benefit = -100 # np.NaN # if empty dataframe
+                benefit = np.NaN # np.NaN # if empty dataframe
             return benefit
         
     def get_uncertainty(self, df):
@@ -108,18 +111,24 @@ class DecisionTree:
             probability = (branch_n_1 + branch_n_0)/(n_1 + n_0)
         except:
             probability = np.NaN # if len(df) is 0
-            
         return probability
      
     def accuracy(self, df, model_tree): # predicts accuracy of labeled set given model tree
         y_labels = df["Class"].to_list()
+#        print(y_labels)
         predictions = []
         for i, example in enumerate(df.iterrows()):
             df_ex = df[df.index == i].drop("Class", axis = 1) #single example as df
             y_pred = self.predict(df_ex, model_tree) #prediction of example using model dec tree
             predictions.append(y_pred) 
-        correct = sum([(predictions[i] == y_labels[i]) for i in predictions]) #total correct for set
-        accuracy = correct / len(predictions) # accuracy as percent correct
+            
+#        print(predictions)
+        correct = 0
+        for i in range(len(predictions)):
+            if predictions[i] == y_labels[i]:
+#                print(predictions[i], y_labels[i])
+                correct += 1
+        accuracy = 100 * correct / len(predictions) # accuracy as percent correct
         return accuracy
     
     def predict(self, x_test, y_predict): # predicts poisonous/edible for single example
@@ -135,9 +144,26 @@ class DecisionTree:
             y_predict = self.predict(x_test, y_predict)
             
         else:
-            print("not int or dict")
+            print("error: not int or dict")
         
         return y_predict
+    
+    def plot_train_valid_accuracy(self, train, valid):
+        
+        fig = plt.figure()
+        plt.plot(np.arange(0, len(train)), train, label="training")
+        plt.plot(np.arange(0, len(valid)), valid, label="validation")
+
+        plt.ylim((0, 100))
+
+        plt.xlabel("Max depth")
+        plt.ylabel("Accuracy [%]")
+
+        plt.title("Train and validation accuracy")
+        plt.legend()
+#        plt.show()
+        plt.savefig('fig/part1/train_validation_accuracy.png')
+#        plt.close(fig)
 
 if __name__ == "__main__":
     
@@ -158,14 +184,30 @@ if __name__ == "__main__":
 #    df_test = df_test.drop(cols_to_drop, axis = 1)
 
     # make decision tree model
-    max_depth = 5
+    max_depth = 2
     DT = DecisionTree(df_train, max_depth)
     model_tree = DT.make_decisiontree(df_train)
 
     # predict example
-    x_test = df_test[df_test.index == 78]
-    y_pred = DT.predict(x_test, model_tree)
+#    x_test = df_test[df_test.index == 78]
+#    y_pred = DT.predict(x_test, model_tree)
     
     # validation accuracy
     valid_accuracy = DT.accuracy(df_valid, model_tree)
+    print(f"validation accuracy for max depth of {max_depth}:", valid_accuracy)
+    
+    # plot train and validation accuracy for depths 1 -> 8
+    train_acc = []
+    valid_acc = []
+    for i in range(1, 9):
+        DT = DecisionTree(df_train, i)
+        model_tree = DT.make_decisiontree(df_train)
+        
+        train_accuracy = DT.accuracy(df_train, model_tree)
+        valid_accuracy = DT.accuracy(df_valid, model_tree)
+        
+        train_acc.append(train_accuracy)
+        valid_acc.append(valid_accuracy)
+        
+    DT.plot_train_valid_accuracy(train_acc, valid_acc)
     
