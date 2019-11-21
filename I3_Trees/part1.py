@@ -34,13 +34,14 @@ class DecisionTree:
             
             df_0 = df[df.eval(split_on) == 0]
             df_1 = df[df.eval(split_on) == 1]
-#            print("length of df0 and df1:", len(df_0), len(df_1))
+            print("length of df0 and df1:", len(df_0), len(df_1))
             
             depth += 1
-#            print(depth)
+            print(depth)
             
-            ans_0 = self.make_decisiontree(df_0, depth)
             ans_1 = self.make_decisiontree(df_1, depth)
+            ans_0 = self.make_decisiontree(df_0, depth)
+            
             
             tree[str(split_on)].append(ans_0)
             tree[str(split_on)].append(ans_1)
@@ -105,7 +106,7 @@ class DecisionTree:
         n_0 = len(df) - n_1 # remainder are edible
         
         #branch is df of feature = 0 or 1 (result)
-        branch = df[df.eval(feature) != feature_result]
+        branch = df[df.eval(feature) == feature_result]
         branch_n_1 = sum(branch["Class"])
         branch_n_0 = len(branch) - branch_n_1
         
@@ -123,8 +124,8 @@ class DecisionTree:
             df_ex = df[df.index == i].drop("Class", axis = 1) #single example as df
             y_pred = self.predict(df_ex, model_tree) #prediction of example using model dec tree
             predictions.append(y_pred) 
-            
-#        print(predictions)
+     
+        print(len(predictions), len(y_labels))
         correct = 0
         for i in range(len(predictions)):
             if predictions[i] == y_labels[i]:
@@ -164,7 +165,7 @@ class DecisionTree:
         plt.title("Train and validation accuracy")
         plt.legend()
 #        plt.show()
-        plt.savefig('fig/part1/train_validation_accuracy.png')
+        plt.savefig('fig/part1/train_validation_accuracy_10-15.png')
 #        plt.close(fig)
 
 if __name__ == "__main__":
@@ -178,38 +179,38 @@ if __name__ == "__main__":
     df_valid.columns = [col.replace("-", "").replace("class", "Class").replace("?", "unk") for col in df_valid.columns]
     df_test.columns = [col.replace("-", "").replace("?", "unk") for col in df_test.columns]
     
-    # remove columns where value is same for all molecules
-#    nunique = df_train.apply(pd.Series.nunique)
-#    cols_to_drop = list(nunique[nunique == 1].index)
-#    df_train = df_train.drop(cols_to_drop, axis=1)
-#    df_valid = df_valid.drop(cols_to_drop, axis = 1)
-#    df_test = df_test.drop(cols_to_drop, axis = 1)
+    # remove columns where value is same for all molecules - ex: veil-type_p
+    nunique = df_train.apply(pd.Series.nunique)
+    cols_to_drop = list(nunique[nunique == 1].index)
+    df_train = df_train.drop(cols_to_drop, axis=1)
+    df_valid = df_valid.drop(cols_to_drop, axis = 1)
+    df_test = df_test.drop(cols_to_drop, axis = 1)
 
     # make decision tree model
-    max_depth = 2
+    max_depth = 5
     DT = DecisionTree(max_depth)
     model_tree = DT.make_decisiontree(df_train)
 
     # predict example
-#    x_test = df_test[df_test.index == 78]
-#    y_pred = DT.predict(x_test, model_tree)
+    x_test = df_test[df_test.index == 78]
+    y_pred = DT.predict(x_test, model_tree)
     
     # validation accuracy
     valid_accuracy = DT.accuracy(df_valid, model_tree)
     print(f"validation accuracy for max depth of {max_depth}:", valid_accuracy)
-    
+#    
     # plot train and validation accuracy for depths 1 -> 8
-    train_acc = []
-    valid_acc = []
-    for i in range(1, 9):
-        DT = DecisionTree(df_train, i)
-        model_tree = DT.make_decisiontree(df_train)
-        
-        train_accuracy = DT.accuracy(df_train, model_tree)
-        valid_accuracy = DT.accuracy(df_valid, model_tree)
-        
-        train_acc.append(train_accuracy)
-        valid_acc.append(valid_accuracy)
-        
-    DT.plot_train_valid_accuracy(train_acc, valid_acc)
+#    train_acc = []
+#    valid_acc = []
+#    for i in range(10, 15):
+#        DT = DecisionTree(i)
+#        model_tree = DT.make_decisiontree(df_train)
+#        
+#        train_accuracy = DT.accuracy(df_train, model_tree)
+#        valid_accuracy = DT.accuracy(df_valid, model_tree)
+#        
+#        train_acc.append(train_accuracy)
+#        valid_acc.append(valid_accuracy)
+#        
+#    DT.plot_train_valid_accuracy(train_acc, valid_acc)
     
