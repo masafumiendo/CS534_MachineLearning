@@ -15,17 +15,23 @@ from part1 import DecisionTree as DecisionTree
 
 class RandomForest:
     
-    def __init__(self, n_trees, m_features, max_depth):
+    def __init__(self, n_trees = 1, m_features = 100, max_depth = 2):
     
         self.n_trees = n_trees
         self.m_features = m_features
         self.max_depth = max_depth
         
-    def make_n_trees(self):
+    def make_n_trees(self, df_train):
         trees = []
         
         for t in range(self.n_trees):
-            tree = 
+            df = self.bootstrap(df_train)
+            df = self.get_m_features(df)
+            DT = DecisionTree(max_depth=self.max_depth)
+            tree = DT.make_decisiontree(df)
+            trees.append(tree)
+            
+        return trees
         
     def bootstrap(self, df):
         # sample len(df) with replacement
@@ -39,6 +45,47 @@ class RandomForest:
         new_features.append("Class")
         new_df = df[new_features]
         return new_df
+    
+    def accuracy(self, df, model_trees):
+        
+        y_labels = df["Class"].to_list()
+#        print(y_labels)
+        predictions = []
+        for i, example in enumerate(df.iterrows()):
+            df_ex = df[df.index == i].drop("Class", axis = 1) #single example as df
+            votes = []
+            for tree in model_trees:
+                DT = DecisionTree(max_depth=self.max_depth) # because .predict needs self
+                vote = DT.predict(df_ex, tree) #prediction of example using one tree
+                votes.append(vote)
+            y_pred = max(set(votes), key = votes.count) 
+            predictions.append(y_pred) 
+     
+        correct = 0
+        for i in range(len(predictions)):
+            if predictions[i] == y_labels[i]:
+#                print(predictions[i], y_labels[i])
+                correct += 1
+        accuracy = 100 * correct / len(predictions) # accuracy as percent correct
+        return accuracy
+            
+        return accuracy
+    
+    def plot_train_valid_accuracy(self, train, valid, n_trees_set):
+        plt.plot(n_trees_set, train, label="training")
+        plt.plot(n_trees_set, valid, label="validation")
+
+        plt.ylim((0, 100))
+
+        plt.xlabel("Number of trees")
+        plt.ylabel("Accuracy [%]")
+
+        plt.title("Train and validation accuracy")
+        plt.legend()
+#        plt.show()
+        plt.savefig('fig/part2/2b_vary_trees_train_validation_accuracy.png')
+#        plt.close(fig)
+
 
 if __name__ == "__main__":
     
@@ -58,6 +105,31 @@ if __name__ == "__main__":
     df_valid = df_valid.drop(cols_to_drop, axis = 1)
     df_test = df_test.drop(cols_to_drop, axis = 1)
 
-    rf = RandomForest(5, 6, 7)
-    new_df = rf.bootstrap(df_train)
-    newer_df = rf.get_m_features(new_df)
+#    rf = RandomForest(n_trees = 5, m_features = 100, max_depth = 2)
+#    new_df = rf.bootstrap(df_train)
+#    newer_df = rf.get_m_features(new_df)
+#    
+#    model = rf.make_n_trees(df_train)
+#    
+#    valid_acc = rf.accuracy(df_valid, model)
+#    train_acc = rf.accuracy(df_train, model)
+#    print(train_acc, valid_acc)
+#    
+    
+    # part 2b
+    # plot train and validation accuracy for n_trees_set
+    train_acc = []
+    valid_acc = []
+    n_trees_set = [1, 2, 5, 10, 25]
+    for n in n_trees_set:
+        rf = RandomForest(n_trees = n, m_features = 5, max_depth = 2)
+        model_tree = rf.make_n_trees(df_train)
+        
+        train_accuracy = rf.accuracy(df_train, model_tree)
+        valid_accuracy = rf.accuracy(df_valid, model_tree)
+        print(train_accuracy, valid_accuracy)
+        
+        train_acc.append(train_accuracy)
+        valid_acc.append(valid_accuracy)
+        
+    rf.plot_train_valid_accuracy(train_acc, valid_acc, n_trees_set)

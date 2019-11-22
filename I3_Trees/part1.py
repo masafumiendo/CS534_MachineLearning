@@ -30,14 +30,16 @@ class DecisionTree:
             
         else:
             split_on = self.split_node(df)
+#            if split_on == np.NaN:
+                
             tree = {str(split_on): []}
             
             df_0 = df[df.eval(split_on) == 0]
             df_1 = df[df.eval(split_on) == 1]
-            print("length of df0 and df1:", len(df_0), len(df_1))
+#            print("length of df0 and df1:", len(df_0), len(df_1))
             
             depth += 1
-            print(depth)
+#            print(depth)
             
             ans_1 = self.make_decisiontree(df_1, depth)
             ans_0 = self.make_decisiontree(df_0, depth)
@@ -67,7 +69,11 @@ class DecisionTree:
 
         benefits = [self.get_benefit(df, feature) for feature in self.features]
 #        print("max benefit value:", np.nanmax(benefits))
-        split_on = self.features[np.nanargmax(benefits)] # split on feature with max benefit value
+        try:
+            split_on = self.features[np.nanargmax(benefits)] # split on feature with max benefit value
+        except:
+            print(benefits)
+            split_on = np.NaN
 #        print(benefits[0:10])
 #        print(split_on)
         return split_on
@@ -171,7 +177,7 @@ class DecisionTree:
 if __name__ == "__main__":
     
     df_train = pd.read_csv('pa3_train.csv')
-    df_valid = pd.read_csv('pa3_val    .csv')
+    df_valid = pd.read_csv('pa3_val.csv')
     df_test = pd.read_csv('pa3_test.csv')
     
     # change column names to remove '-' from col names because of pandas issue, also class-> Class bc of class object, replace '?'
