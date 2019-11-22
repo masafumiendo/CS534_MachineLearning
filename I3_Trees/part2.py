@@ -9,28 +9,36 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from pprint import pprint
+from random import sample
 from part1 import DecisionTree as DecisionTree
+
 
 class RandomForest:
     
-    def __init__(self, n_trees, n_features, max_depth):
+    def __init__(self, n_trees, m_features, max_depth):
     
         self.n_trees = n_trees
+        self.m_features = m_features
         self.max_depth = max_depth
-        self.n_features = n_features
+        
+    def make_n_trees(self):
+        trees = []
+        
+        for t in range(self.n_trees):
+            tree = 
         
     def bootstrap(self, df):
         # sample len(df) with replacement
-        sample_indices = []
-        for a in range(len(df)):
-#        if len(sample_indices) < len(df):
-            index = np.random.randint(len(df))
-            sample_indices.append(index)
-        new_df = df[df.index in sample_indices]
-        
+        new_df = df.sample(frac=1, replace=True, random_state=42)
         return new_df
         
-
+    def get_m_features(self, df):
+        # sample m features for tree
+        features = list(df.drop("Class", axis = 1).columns)
+        new_features = sample(features, self.m_features)
+        new_features.append("Class")
+        new_df = df[new_features]
+        return new_df
 
 if __name__ == "__main__":
     
@@ -50,4 +58,6 @@ if __name__ == "__main__":
     df_valid = df_valid.drop(cols_to_drop, axis = 1)
     df_test = df_test.drop(cols_to_drop, axis = 1)
 
-    rf = RandomForest(1, 2, 3)
+    rf = RandomForest(5, 6, 7)
+    new_df = rf.bootstrap(df_train)
+    newer_df = rf.get_m_features(new_df)

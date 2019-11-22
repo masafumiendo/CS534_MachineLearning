@@ -21,7 +21,7 @@ class DecisionTree:
         
     def make_decisiontree(self, df, depth=0):
         if depth == 0:
-            self.features = list(df.columns)[:-1]
+            self.features = list(df.drop("Class", axis = 1).columns) 
             
         if self.check_pure(df) == True or depth == self.max_depth:
 #            print("check pure: ", self.check_pure(df))
@@ -125,7 +125,7 @@ class DecisionTree:
             y_pred = self.predict(df_ex, model_tree) #prediction of example using model dec tree
             predictions.append(y_pred) 
      
-        print(len(predictions), len(y_labels))
+#        print(len(predictions), len(y_labels))
         correct = 0
         for i in range(len(predictions)):
             if predictions[i] == y_labels[i]:
@@ -153,11 +153,11 @@ class DecisionTree:
     
     def plot_train_valid_accuracy(self, train, valid):
         
-        fig = plt.figure()
-        plt.plot(np.arange(0, len(train)), train, label="training")
-        plt.plot(np.arange(0, len(valid)), valid, label="validation")
+#        fig = plt.figure()
+        plt.plot(np.arange(1,1+ len(train)), train, label="training")
+        plt.plot(np.arange(1,1+ len(valid)), valid, label="validation")
 
-        plt.ylim((0, 100))
+        plt.ylim((80, 100))
 
         plt.xlabel("Max depth")
         plt.ylabel("Accuracy [%]")
@@ -165,13 +165,13 @@ class DecisionTree:
         plt.title("Train and validation accuracy")
         plt.legend()
 #        plt.show()
-        plt.savefig('fig/part1/train_validation_accuracy_10-15.png')
+        plt.savefig('fig/part1/train_validation_accuracy.png')
 #        plt.close(fig)
 
 if __name__ == "__main__":
     
     df_train = pd.read_csv('pa3_train.csv')
-    df_valid = pd.read_csv('pa3_val.csv')
+    df_valid = pd.read_csv('pa3_val    .csv')
     df_test = pd.read_csv('pa3_test.csv')
     
     # change column names to remove '-' from col names because of pandas issue, also class-> Class bc of class object, replace '?'
@@ -185,8 +185,8 @@ if __name__ == "__main__":
     df_train = df_train.drop(cols_to_drop, axis=1)
     df_valid = df_valid.drop(cols_to_drop, axis = 1)
     df_test = df_test.drop(cols_to_drop, axis = 1)
-
-    # make decision tree model
+#
+#    # make decision tree model
     max_depth = 5
     DT = DecisionTree(max_depth)
     model_tree = DT.make_decisiontree(df_train)
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     # plot train and validation accuracy for depths 1 -> 8
 #    train_acc = []
 #    valid_acc = []
-#    for i in range(10, 15):
+#    for i in range(1, 9):
 #        DT = DecisionTree(i)
 #        model_tree = DT.make_decisiontree(df_train)
 #        
