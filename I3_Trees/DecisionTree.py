@@ -12,7 +12,7 @@ class DecisionTree:
 
     # Public method
     # Method for making decision tree
-    def make_tree(self, df, depth=0):
+    def make_tree(self, df, depth=0, sample_weight=None):
 
         if depth == 0:
             self.features = list(df.drop("Class", axis=1).columns)
