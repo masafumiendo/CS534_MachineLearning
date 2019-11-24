@@ -66,7 +66,6 @@ class RandomForest:
                 #                print(predictions[i], y_labels[i])
                 correct += 1
         accuracy = 100 * correct / len(predictions)  # accuracy as percent correct
-        return accuracy
 
         return accuracy
 
