@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+from random import sample
 
 class DecisionTree:
 
@@ -13,6 +14,8 @@ class DecisionTree:
     # Public method
     # Method for making decision tree
     def make_tree(self, df, depth=0, sample_weight=None):
+
+        self.sample_weight = sample_weight
 
         if depth == 0:
             self.features = list(df.drop("Class", axis=1).columns)
@@ -31,6 +34,35 @@ class DecisionTree:
 
             ans_0 = self.make_tree(df_0, depth)
             ans_1 = self.make_tree(df_1, depth)
+
+            tree[str(split_on)].append(ans_0)
+            tree[str(split_on)].append(ans_1)
+
+            return tree
+
+    # Method for making decision tree for random forest
+    def make_tree_rf(self, df, m_features, depth=0):
+
+        if depth == 0:
+            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
+
+        if self.__check_pure(df) == True or depth == self.max_depth:
+            return self.__classify_leaf(df)
+        else:
+            split_on = self.__split_node(df)
+
+            tree = {str(split_on): []}
+
+            df_0 = df[df.eval(split_on) == 0]
+            df_1 = df[df.eval(split_on) == 1]
+
+            depth += 1
+
+            # Re-sampling for the next right and left node
+            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
+            ans_0 = self.make_tree_rf(df_0, m_features, depth)
+            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
+            ans_1 = self.make_tree_rf(df_1, m_features, depth)
 
             tree[str(split_on)].append(ans_0)
             tree[str(split_on)].append(ans_1)
