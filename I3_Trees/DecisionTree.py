@@ -44,6 +44,7 @@ class DecisionTree:
     def make_tree_rf(self, df, m_features, depth=0):
 
         if depth == 0:
+            self.features_remain = list(df.drop("Class", axis=1).columns)
             self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
 
         if self.__check_pure(df) == True or depth == self.max_depth:
@@ -59,9 +60,9 @@ class DecisionTree:
             depth += 1
 
             # Re-sampling for the next right and left node
-            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
+            self.features = self.__select_features(m_features)
             ans_0 = self.make_tree_rf(df_0, m_features, depth)
-            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
+            self.features = self.__select_features(m_features)
             ans_1 = self.make_tree_rf(df_1, m_features, depth)
 
             tree[str(split_on)].append(ans_0)
@@ -181,3 +182,12 @@ class DecisionTree:
             prob = np.NaN
 
         return prob
+
+    def __select_features(self, m_features):
+
+        for i in self.features:
+            self.features_remain.remove(i)
+
+        features = sample(self.features_remain, m_features)
+
+        return features
