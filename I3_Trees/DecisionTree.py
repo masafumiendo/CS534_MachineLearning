@@ -76,7 +76,7 @@ class DecisionTree:
             self.features = list(df.drop("Class", axis=1).columns)
 
         if self.__check_pure(df) == True or depth == self.max_depth:
-            return self.__classify_leaf(df)
+            return self.__classify_leaf(df, weight, True)
         else:
             split_on = self.__split_node(df, weight, weight_flag)
 
@@ -140,13 +140,26 @@ class DecisionTree:
         else:
             return False
 
-    def __classify_leaf(self, df):
-        n_1 = sum(df["Class"])
-        n_0 = len(df) - n_1
-        if n_1 > n_0:
-            return 1
-        else:
-            return 0
+    def __classify_leaf(self, df, weight=None, weight_flag=False):
+        if weight_flag == False:
+            n_1 = sum(df["Class"])
+            n_0 = len(df) - n_1
+            if n_1 > n_0:
+                return 1
+            else:
+                return 0
+        elif weight_flag == True:
+            sum_w0 = 0
+            sum_w1 = 0
+            for i in range(len(df)):
+                if df[df.index == i].Class.values[0] == 0:
+                    sum_w0 += weight[i]
+                elif df[df.index == i].Class.values[0] == 1:
+                    sum_w1 += weight[i]
+            if sum_w1 > sum_w0:
+                return 1
+            else:
+                return 0
 
     def __split_node(self, df, weight, weight_flag):
 
