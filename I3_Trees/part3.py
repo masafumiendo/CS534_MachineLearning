@@ -29,6 +29,7 @@ class AdaBoost:
         weight = np.ones(N) / N # Initialize the weight
 
         for i in range(self.num_learners):
+            print(weight)
             tree = self.learners[i].make_tree_adaboost(df, weight)
             mistakes = (self.learners[i].predict(x, tree) != y)
 
@@ -74,9 +75,11 @@ def main():
 
     DT = DecisionTree.DecisionTree(1) # with max depth is one
 
-    adaboost = AdaBoost(DT, 10) # The number of weak leaners
+    adaboost = AdaBoost(DT, 5) # The number of weak leaners
 
     adaboost.train(df_train)
+
+    predict = adaboost.predict(df_valid)
 
 if __name__ == '__main__':
     main()
