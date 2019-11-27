@@ -53,7 +53,8 @@ class DecisionTree:
 #            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
             self.features = sample(self.features_remain, m_features)
             self.features_remain = [f for f in self.features_remain if f not in self.features]
-            test_df = df[self.features.append("Class")] #with new sampled features plus Class col
+            columns = [*self.features, "Class"]
+            test_df = df[columns] #with new sampled features plus Class col
             split_on = self.__split_node(test_df)
 
             tree = {str(split_on): []}
