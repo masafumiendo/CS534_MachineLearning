@@ -37,10 +37,15 @@ class AdaBoost:
 
             # Compute the epsilon and alpha
             epsilon = np.sum(weight * mistakes)
-            self.alpha[i] = np.log(1.0/epsilon - 1)
+            self.alpha[i] = 1/2 * np.log(1.0/epsilon - 1)
 
             # Update the weight
-            weight = weight * np.exp(self.alpha[i] * mistakes)
+            # weight = weight * np.exp(self.alpha[i] * mistakes)
+            for j in range(len(weight)):
+                if mistakes[j] == True:
+                    weight[j] = weight[j] * np.exp(self.alpha[i])
+                elif mistakes[j] == False:
+                    weight[j] = weight[j] * np.exp(-self.alpha[i])
             weight = weight / np.sum(weight)
 
     # Method for prediction
@@ -53,6 +58,24 @@ class AdaBoost:
             base_pred[i] = self.learners[i].predict(x, self.trees[i])
 
         return np.sign(base_pred.T @ self.alpha)
+
+    # Method for computing accuracy
+    def accuracy(self, prediction, df):
+
+        y = df["Class"].to_list()
+        y = self.__label_converter(y)
+
+        cnt = 0
+
+        for i in range(len(y)):
+            if y[i] == prediction[i]:
+                cnt += 1
+            else:
+                pass
+
+        accuracy = cnt / len(y)
+
+        return accuracy
 
     def __label_converter(self, y):
 
@@ -80,6 +103,8 @@ def main():
     adaboost.train(df_train)
 
     predict = adaboost.predict(df_valid)
+
+    accuracy = adaboost.accuracy(predict, df_valid)
 
 if __name__ == '__main__':
     main()
