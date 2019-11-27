@@ -23,7 +23,7 @@ class AdaBoost:
 
         x = df.drop("Class", axis=1)
         y = df["Class"].to_list()
-        y = self.__label_converter(y)
+        # y = self.__label_converter(y)
 
         N = len(x)
         weight = np.ones(N) / N # Initialize the weight
@@ -31,7 +31,15 @@ class AdaBoost:
         for i in range(self.num_learners):
             print(weight)
             tree = self.learners[i].make_tree_adaboost(df, weight)
-            mistakes = (self.learners[i].predict(x, tree) != y)
+            print(tree)
+            mistakes = np.zeros(len(df))
+            for j, example in enumerate(df.iterrows()):
+                df_ex = df[df.index == j].drop("Class", axis=1)
+                prediction = self.learners[i].predict(df_ex, tree)
+                if prediction == y[j]:
+                    mistakes[j] = False
+                elif prediction != y[j]:
+                    mistakes[j] = True
 
             self.trees.append(tree)
 
@@ -40,13 +48,17 @@ class AdaBoost:
             self.alpha[i] = 1/2 * np.log(1.0/epsilon - 1)
 
             # Update the weight
-            # weight = weight * np.exp(self.alpha[i] * mistakes)
             for j in range(len(weight)):
                 if mistakes[j] == True:
+                    # print(j)
                     weight[j] = weight[j] * np.exp(self.alpha[i])
                 elif mistakes[j] == False:
                     weight[j] = weight[j] * np.exp(-self.alpha[i])
+            print(sum(mistakes))
+
             weight = weight / np.sum(weight)
+            #print(sum(weight))
+            #print(np.unique(weight))
 
     # Method for prediction
     def predict(self, df):
@@ -55,8 +67,11 @@ class AdaBoost:
 
         base_pred = np.zeros((self.num_learners, len(x)))
         for i in range(self.num_learners):
-            base_pred[i] = self.learners[i].predict(x, self.trees[i])
-
+            for j, example in enumerate(df.iterrows()):
+                df_ex = df[df.index == j].drop("Class", axis=1)
+                base_pred[i][j] = self.learners[i].predict(df_ex, self.trees[i])
+            print(base_pred[i])
+            print(np.sign(base_pred.T @ self.alpha))
         return np.sign(base_pred.T @ self.alpha)
 
     # Method for computing accuracy
@@ -64,7 +79,7 @@ class AdaBoost:
 
         y = df["Class"].to_list()
         y = self.__label_converter(y)
-
+        print(self.alpha)
         cnt = 0
 
         for i in range(len(y)):
@@ -105,6 +120,8 @@ def main():
     predict = adaboost.predict(df_valid)
 
     accuracy = adaboost.accuracy(predict, df_valid)
+
+    print(accuracy)
 
 if __name__ == '__main__':
     main()
