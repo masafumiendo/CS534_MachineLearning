@@ -29,7 +29,7 @@ class AdaBoost:
         weight = np.ones(N) / N # Initialize the weight
 
         for i in range(self.num_learners):
-            tree = self.learners[i].make_tree(df)
+            tree = self.learners[i].make_tree_adaboost(df, weight)
             mistakes = (self.learners[i].predict(x, tree) != y)
 
             self.trees.append(tree)

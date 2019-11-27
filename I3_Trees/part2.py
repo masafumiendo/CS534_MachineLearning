@@ -26,8 +26,8 @@ class RandomForest:
     def make_trees(self, df):
 
         for t in range(self.n_trees):
-            df_ex = self.__bootstrap(df)
-            tree = self.learners[t].make_tree_rf(df_ex, self.m_features)
+            df_bootstrap = self.__bootstrap(df)
+            tree = self.learners[t].make_tree_rf(df_bootstrap, self.m_features)
 
             self.trees.append(tree)
 
@@ -58,7 +58,8 @@ class RandomForest:
         return accuracy
 
     def plot(self, train, valid, variable, parameter):
-
+        
+        fig = plt.figure()
         plt.plot(variable, train, label="training")
         plt.plot(variable, valid, label="validation")
         plt.xlabel("number of " + parameter)
@@ -68,18 +69,10 @@ class RandomForest:
         plt.legend()
 
         plt.savefig('fig/part2/train_valid_acc_{0}.png'.format(parameter))
-
+        plt.close()
+        
     def __bootstrap(self, df):
         return df.sample(frac=1, replace=True, random_state=42)
-
-    def __get_features(self, df):
-
-        features = list(df.drop("Class", axis=1).columns)
-        features = sample(features, self.m_features)
-        features.append("Class")
-        df = df[features]
-
-        return df
 
 def main():
 
