@@ -93,7 +93,6 @@ def main():
 
         train_acc = RF.accuracy(df_train)
         valid_acc = RF.accuracy(df_valid)
-        train_acc = 0
 
         print("training accuracy: {0}, validation accuracy: {1} with {2} decision trees".format(train_acc, valid_acc, n))
 
