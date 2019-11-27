@@ -40,15 +40,16 @@ class RandomForest:
         for i, example in enumerate(df.iterrows()):
             df_ex = df[df.index == i].drop("Class", axis=1)
             votes = []
+
             for j in range(self.n_trees):
+
                 vote = self.learners[j].predict(df_ex, self.trees[j])
                 votes.append(vote)
 
             y_pred = max(set(votes), key=votes.count)
             predictions.append(y_pred)
 
-            correct = 0
-
+        correct = 0
         for k in range(len(predictions)):
             if predictions[k] == y_labels[k]:
                 correct += 1
@@ -72,14 +73,6 @@ class RandomForest:
     def __bootstrap(self, df):
         return df.sample(frac=1, replace=True, random_state=42)
 
-    def __get_features(self, df):
-
-        features = list(df.drop("Class", axis=1).columns)
-        features = sample(features, self.m_features)
-        features.append("Class")
-        df = df[features]
-
-        return df
 
 def main():
 
@@ -89,16 +82,18 @@ def main():
 
     train_accs = []
     valid_accs = []
-    n_trees = [1, 2, 5, 10, 25]
+    n_trees = [1, 2, 5, 10, 25] # 
     m_features = [1, 2, 5, 10, 25, 50]
 
     # Loop for number of trees
     for n in n_trees:
+        print(n)
         RF = RandomForest(n_trees=n, class_learner=DecisionTree.DecisionTree(2), m_features=5)
         RF.make_trees(df_train)
 
         train_acc = RF.accuracy(df_train)
         valid_acc = RF.accuracy(df_valid)
+        train_acc = 0
 
         print("training accuracy: {0}, validation accuracy: {1} with {2} decision trees".format(train_acc, valid_acc, n))
 

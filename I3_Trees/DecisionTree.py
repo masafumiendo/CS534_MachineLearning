@@ -42,20 +42,21 @@ class DecisionTree:
             return tree
 
     # Method for making decision tree for random forest
-    def make_tree_rf(self, df, m_features, depth=0):
+    def make_tree_rf(self, df, m_features, features_remain = None, depth=0):
 
         if depth == 0:
-            self.features_remain = list(df.drop("Class", axis=1).columns)
+            features_remain = list(df.drop("Class", axis=1).columns)
         
         if self.__check_pure(df) == True or depth == self.max_depth:
             return self.__classify_leaf(df)
         else:
 #            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
-            self.features = sample(self.features_remain, m_features)
-            self.features_remain = [f for f in self.features_remain if f not in self.features]
+            self.features = sample(features_remain, m_features)
+            
             columns = [*self.features, "Class"]
             test_df = df[columns] #with new sampled features plus Class col
             split_on = self.__split_node(test_df)
+            features_remain = [f for f in features_remain if f != split_on] # remove feature from list remaining
 
             tree = {str(split_on): []}
 
@@ -66,9 +67,9 @@ class DecisionTree:
 
             # Re-sampling for the next right and left node
 #            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
-            ans_0 = self.make_tree_rf(df_0, m_features, depth)
+            ans_0 = self.make_tree_rf(df_0, m_features, features_remain=features_remain, depth=depth)
 #            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
-            ans_1 = self.make_tree_rf(df_1, m_features, depth)
+            ans_1 = self.make_tree_rf(df_1, m_features, features_remain=features_remain, depth=depth)
 
             tree[str(split_on)].append(ans_0)
             tree[str(split_on)].append(ans_1)
