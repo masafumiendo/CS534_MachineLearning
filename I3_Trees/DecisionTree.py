@@ -45,15 +45,15 @@ class DecisionTree:
     def make_tree_rf(self, df, m_features, depth=0):
 
         if depth == 0:
-            self.global_df = df
-            
-        features = sample(list(self.global_df.drop("Class", axis=1).columns), m_features)
-#        df = self.__get_m_features(self.global_df)
-
+            self.features_remain = list(df.drop("Class", axis=1).columns)
+        
         if self.__check_pure(df) == True or depth == self.max_depth:
             return self.__classify_leaf(df)
         else:
-            test_df = df[features.append("Class")] #with new sampled features plus Class col
+#            self.features = sample(list(df.drop("Class", axis=1).columns), m_features)
+            self.features = sample(self.features_remain, m_features)
+            self.features_remain = [f for f in self.features_remain if f not in self.features]
+            test_df = df[self.features.append("Class")] #with new sampled features plus Class col
             split_on = self.__split_node(test_df)
 
             tree = {str(split_on): []}
@@ -73,14 +73,6 @@ class DecisionTree:
             tree[str(split_on)].append(ans_1)
 
             return tree
-        
-    def __get_m_features(self, df):
-        # sample m features for tree
-        features = list(df.drop("Class", axis = 1).columns)
-        new_features = sample(features, self.m_features)
-        new_features.append("Class")
-        new_df = df[new_features]
-        return new_df
 
     # Method for getting accuracy of the prediction
     def accuracy(self, df, model_tree):
