@@ -21,7 +21,7 @@ class DecisionTree:
         if self.__check_pure(df) == True or depth == self.max_depth:
             return self.__classify_leaf(df)
         else:
-            split_on = self.__split_node(df, weight, weight_flag)
+            split_on = self.__split_node(df, weight_flag)
 
             tree = {str(split_on): []}
 
@@ -39,7 +39,7 @@ class DecisionTree:
             return tree
 
     # Method for making decision tree for random forest
-    def make_tree_rf(self, df, m_features, features_remain = None, depth=0):
+    def make_tree_rf(self, df, m_features, features_remain=None, depth=0):
 
         if depth == 0:
             features_remain = list(df.drop("Class", axis=1).columns)
@@ -50,7 +50,7 @@ class DecisionTree:
 
             # Here pick candidates, split based on best feature, and remove the best feature from all of features
             self.features = sample(features_remain, m_features)
-            split_on = self.__split_node(df)
+            split_on = self.__split_node(df, weight_flag=False)
             features_remain.remove(str(split_on))
 
             tree = {str(split_on): []}
@@ -71,7 +71,7 @@ class DecisionTree:
 
     # Method for making decision tree for AdaBoost
     def make_tree_adaboost(self, df, depth=0, weight_flag=True):
-       # print(depth)
+
         if depth == 0:
             self.features = list(df.drop(["weight", "Class"], axis=1).columns)
 
@@ -150,29 +150,28 @@ class DecisionTree:
             else:
                 return 0
         elif weight_flag == True:
-           # print(df.weight.values)
+
             weight = df["weight"].values
             Class = df["Class"].values
-           # print("weights", weight)
+
             sum_w0 = 0
             sum_w1 = 0
-         #   print(df.Class)
+
             for i in range(len(df)):
-                # print("weight:", df[df.index == i].weight.values[0])
-                # print("class", df[df.index == i].Class.values[0])
+
                 if Class[i] == 0:
-                    sum_w0 += weight[i] #df[df.index == i].weight.values[0]
+                    sum_w0 += weight[i]
                 elif Class[i] == 1:
-                    sum_w1 += weight[i] #df[df.index == i].weight.values[0]
+                    sum_w1 += weight[i]
             if sum_w1 > sum_w0:
                 return 1
             else:
                 return 0
 
     def __split_node(self, df, weight_flag):
-       # print(self.features)
+
         benefits = [self.__get_benefit(df, feature, weight_flag) for feature in self.features]
-      #  print(benefits)
+
         try:
             split_on = self.features[np.nanargmax(benefits)]
         except:
@@ -195,14 +194,10 @@ class DecisionTree:
 
             benefit = U_A - (p_left * U_AL) - (p_right * U_AR)
 
-            # except:
-                #benefit = np.NaN
-         #   print(benefit)
             return benefit
 
     def __get_uncertainty(self, df, weight_flag=False):
-        weight = df["weight"].values
-        df = df.drop("weight", axis=1)
+
         if weight_flag == False:
             n_1 = sum(df["Class"])
             n_0 = len(df) - n_1
@@ -216,6 +211,10 @@ class DecisionTree:
             return U
 
         else:
+
+            weight = df["weight"].values
+            df = df.drop("weight", axis=1)
+
             # Obtain correct label
             correct_label = df["Class"].to_list()
 
@@ -226,20 +225,17 @@ class DecisionTree:
             # Loop for weight summation
             for i in range(len(correct_label)):
                 if correct_label[i] == 1:
-                    sum_w_1 += weight[i] # df[df.index == i].weight.values[0]
-                    #print("sum w1", sum_w_1)
+                    sum_w_1 += weight[i]
                 elif correct_label[i] == 0:
-                    sum_w_0 += weight[i] #df[df.index == i].weight.values[0]
-                    #print("sum w0", sum_w_0)
+                    sum_w_0 += weight[i]
 
             sum_w = sum_w_1 + sum_w_0
-        #    print("sum w", sum_w)
 
             try:
                 U = 1 - (float(sum_w_1 / sum_w)) ** 2 - (float(sum_w_0 / sum_w)) ** 2
             except:
                 U = 0 # Use zero value instead of nan
-       #     print(U)
+
             return U
 
     def __get_prob(self, df, feature, feature_result):
