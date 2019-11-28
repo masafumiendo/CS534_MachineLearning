@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cb65ce7c-21b4-4b25-b8f6-ce2ffcea2bea" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/I3_Trees/DecisionTree.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/I3_Trees/PreProcess.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/I3_Trees/part3.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/I3_Trees/fig/part1/train_validation_accuracy.png" beforeDir="false" afterPath="$PROJECT_DIR$/I3_Trees/fig/part1/train_validation_accuracy.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/I3_Trees/part1.py" beforeDir="false" afterPath="$PROJECT_DIR$/I3_Trees/part1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/I3_Trees/part2.py" beforeDir="false" afterPath="$PROJECT_DIR$/I3_Trees/part2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/I3_Trees/DecisionTree_M.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/I3_Trees/fig/part2/train_valid_acc_trees.png" beforeDir="false" afterPath="$PROJECT_DIR$/I3_Trees/fig/part2/train_valid_acc_trees.png" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,28 +13,16 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.46603477">
+    <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/I3_Trees/part1.py">
+            <entry file="file://$PROJECT_DIR$/I3_Trees/part3.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
-                  <caret column="22" lean-forward="true" selection-start-column="22" selection-end-column="22" />
+                <state relative-caret-position="869">
+                  <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
                   <folding>
-                    <element signature="e#108#126#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/I3_Trees/part2.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-503">
-                  <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
-                  <folding>
-                    <element signature="e#107#125#0" expanded="true" />
+                    <element signature="e#48#66#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -47,8 +31,20 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/I3_Trees/DecisionTree.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1152">
-                  <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
+                <state relative-caret-position="2015">
+                  <caret line="213" selection-start-line="213" selection-end-line="213" />
+                  <folding>
+                    <element signature="e#48#66#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/I3_Trees/part2.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="165">
+                  <caret line="11" selection-start-line="11" selection-end-line="11" />
                   <folding>
                     <element signature="e#48#66#0" expanded="true" />
                   </folding>
@@ -60,23 +56,23 @@
       </split-first>
       <split-second>
         <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/I3_Trees/part3.py">
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/I3_Trees/part1.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="561">
-                  <caret line="58" column="29" selection-start-line="58" selection-start-column="29" selection-end-line="58" selection-end-column="29" />
+                <state relative-caret-position="165">
+                  <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
                   <folding>
-                    <element signature="e#48#66#0" expanded="true" />
+                    <element signature="e#108#126#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/I3_Trees/PreProcess.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="75">
-                  <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+                <state relative-caret-position="390">
+                  <caret line="26" selection-start-line="26" selection-end-line="26" />
                 </state>
               </provider>
             </entry>
@@ -94,8 +90,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>__error_graph</find>
-      <find>print</find>
       <find>model</find>
       <find>decisiontree</find>
       <find>Class</find>
@@ -107,9 +101,29 @@
       <find>split_node</find>
       <find>accuracy</find>
       <find>classify_leaf</find>
-      <find>DecisionTree</find>
       <find>tree</find>
+      <find>make_n_trees</find>
+      <find>model_trees</find>
+      <find>__get_features</find>
+      <find>DecisionTree</find>
+      <find>test_df</find>
+      <find>prediction</find>
+      <find>__label_converter</find>
+      <find>x</find>
+      <find>__classify_leaf</find>
+      <find>self.features</find>
+      <find>__split_node</find>
+      <find>__get_benefit</find>
+      <find>__get_uncertainty</find>
+      <find>df</find>
+      <find>features_remain</find>
+      <find>print</find>
+      <find>train</find>
+      <find>self.alpha</find>
     </findStrings>
+    <replaceStrings>
+      <replace>alpha</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -119,18 +133,20 @@
       <list>
         <option value="$PROJECT_DIR$/I2_Perceptron/part1.py" />
         <option value="$PROJECT_DIR$/I3_DecisionTree/part1.py" />
-        <option value="$PROJECT_DIR$/I3_Trees/part2.py" />
         <option value="$PROJECT_DIR$/I3_Trees/pr.py" />
         <option value="$PROJECT_DIR$/I3_Trees/PreProcess.py" />
-        <option value="$PROJECT_DIR$/I3_Trees/DecisionTree.py" />
         <option value="$PROJECT_DIR$/I3_Trees/part1.py" />
+        <option value="$PROJECT_DIR$/I3_Trees/RandomForest.py" />
+        <option value="$PROJECT_DIR$/I3_Trees/part2.py" />
+        <option value="$PROJECT_DIR$/I3_Trees/DecisionTree_M.py" />
+        <option value="$PROJECT_DIR$/I3_Trees/DecisionTree.py" />
         <option value="$PROJECT_DIR$/I3_Trees/part3.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
     <option name="x" value="-1920" />
-    <option name="y" value="508" />
+    <option name="y" value="624" />
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -239,8 +255,17 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="-1920" y="478" width="1920" height="1080" extended-state="0" />
+    <frame x="-1920" y="624" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.24876674" />
@@ -248,32 +273,41 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.26435643" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32970297" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32970297" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32970297" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.20594059" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" weight="0.24876674" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32970297" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32970297" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32970297" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.20594059" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout-to-restore>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/I3_DecisionTree/part1.py" />
-    <entry file="file://$PROJECT_DIR$/I2_Perceptron/part1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="36" column="20" selection-start-line="36" selection-start-column="20" selection-end-line="36" selection-end-column="20" />
-          <folding>
-            <element signature="e#152#170#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/lib/python3.6/site-packages/pandas/core/indexes/base.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="74460">
@@ -291,20 +325,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/I3_Trees/pr.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/I3_Trees/PreProcess.py">
+    <entry file="file://$PROJECT_DIR$/I3_Trees/pr.py" />
+    <entry file="file://$PROJECT_DIR$/I2_Perceptron/part1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+        <state relative-caret-position="-1485">
+          <caret line="36" column="20" selection-start-line="36" selection-start-column="20" selection-end-line="36" selection-end-column="20" />
+          <folding>
+            <element signature="e#152#170#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/I3_Trees/RandomForest.py" />
+    <entry file="file:///usr/local/lib/python3.6/site-packages/pandas/core/generic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="5066" selection-start-line="5066" selection-end-line="5066" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/I3_Trees/DecisionTree_M.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
+          <folding>
+            <element signature="e#48#66#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/I3_Trees/part1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="22" lean-forward="true" selection-start-column="22" selection-end-column="22" />
+        <state relative-caret-position="165">
+          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
           <folding>
             <element signature="e#108#126#0" expanded="true" />
           </folding>
@@ -313,28 +366,42 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/I3_Trees/DecisionTree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1152">
-          <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
+        <state relative-caret-position="2015">
+          <caret line="213" selection-start-line="213" selection-end-line="213" />
           <folding>
             <element signature="e#48#66#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/I3_Trees/part2.py">
+    <entry file="file://$PROJECT_DIR$/I3_Trees/part3.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-503">
-          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+        <state relative-caret-position="869">
+          <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
           <folding>
-            <element signature="e#107#125#0" expanded="true" />
+            <element signature="e#48#66#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/I3_Trees/part3.py">
+    <entry file="file://$PROJECT_DIR$/I2_Perceptron/part3.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="58" column="29" selection-start-line="58" selection-start-column="29" selection-end-line="58" selection-end-column="29" />
+        <state relative-caret-position="124">
+          <caret line="227" column="25" selection-start-line="227" selection-start-column="25" selection-end-line="227" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/I3_Trees/PreProcess.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" selection-start-line="26" selection-end-line="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/I3_Trees/part2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
           <folding>
             <element signature="e#48#66#0" expanded="true" />
           </folding>
