@@ -27,14 +27,15 @@ class AdaBoost:
 
         N = len(x)
         weight = np.ones(N) / N # Initialize the weight
+        df['weight'] = weight
 
         for i in range(self.num_learners):
+
+            tree = self.learners[i].make_tree_adaboost(df)
             print(weight)
-            tree = self.learners[i].make_tree_adaboost(df, weight)
-            print(tree)
             mistakes = np.zeros(len(df))
             for j, example in enumerate(df.iterrows()):
-                df_ex = df[df.index == j].drop("Class", axis=1)
+                df_ex = df[df.index == j].drop(["Class", "weight"], axis=1)
                 prediction = self.learners[i].predict(df_ex, tree)
                 if prediction == y[j]:
                     mistakes[j] = False
@@ -45,33 +46,41 @@ class AdaBoost:
 
             # Compute the epsilon and alpha
             epsilon = np.sum(weight * mistakes)
-            self.alpha[i] = 1/2 * np.log(1.0/epsilon - 1)
+            print("epsilon", epsilon)
+            self.alpha[i] = 1/2 * np.log((1.0 - epsilon)/epsilon)
 
             # Update the weight
+            weight = df["weight"].values
             for j in range(len(weight)):
                 if mistakes[j] == True:
                     # print(j)
                     weight[j] = weight[j] * np.exp(self.alpha[i])
                 elif mistakes[j] == False:
                     weight[j] = weight[j] * np.exp(-self.alpha[i])
-            print(sum(mistakes))
+            print("n mistakes", sum(mistakes))
 
             weight = weight / np.sum(weight)
+            df['weight'] = weight
+            # print(df.columns)
             #print(sum(weight))
-            #print(np.unique(weight))
+            print("alpha ", self.alpha)
+           # print(np.unique(weight))
 
     # Method for prediction
     def predict(self, df):
 
-        x = df.drop("Class", axis=1)
-
-        base_pred = np.zeros((self.num_learners, len(x)))
+        base_pred = np.zeros((self.num_learners, len(df)))
         for i in range(self.num_learners):
             for j, example in enumerate(df.iterrows()):
                 df_ex = df[df.index == j].drop("Class", axis=1)
-                base_pred[i][j] = self.learners[i].predict(df_ex, self.trees[i])
-            print(base_pred[i])
+                prediction = self.learners[i].predict(df_ex, self.trees[i])
+                if prediction == 0:
+                    prediction = -1
+                base_pred[i][j] = prediction
+            #print(base_pred[i])
             print(np.sign(base_pred.T @ self.alpha))
+        self.alpha = self.alpha / np.sum(self.alpha)
+        print(np.sign(base_pred.T @ self.alpha))
         return np.sign(base_pred.T @ self.alpha)
 
     # Method for computing accuracy
@@ -79,7 +88,8 @@ class AdaBoost:
 
         y = df["Class"].to_list()
         y = self.__label_converter(y)
-        print(self.alpha)
+       # prediction = self.__label_converter(prediction)
+        # print(self.alpha)
         cnt = 0
 
         for i in range(len(y)):
@@ -88,6 +98,7 @@ class AdaBoost:
             else:
                 pass
 
+        print("count", cnt)
         accuracy = cnt / len(y)
 
         return accuracy
@@ -105,23 +116,59 @@ class AdaBoost:
 
         return y_convert
 
-def main():
+def learners_plot(train, valid, n_learners):
+    
+    fig = plt.figure()
+
+    plt.plot(n_learners, train, label="training")
+    plt.plot(n_learners, valid, label="validation")
+    plt.xlabel("number of weak learners")
+    plt.ylabel("accuracy [%]")
+    plt.ylim((50, 100))
+    plt.title("training and validation accuracy")
+    plt.legend()
+
+    plt.savefig("fig/part3/n_learners_train_valid_acc.png")
+    
+    plt.clf()
+
+if __name__ == '__main__':
 
     preprocess = PreProcess.PreProcess()
 
     df_train, df_valid, df_test = preprocess.get_data()
 
-    DT = DecisionTree.DecisionTree(1) # with max depth is one
+    # DT = DecisionTree.DecisionTree(2) # with max depth is one
+    #
+    # adaboost = AdaBoost(DT, 5) # The number of weak leaners
+    #
+    # adaboost.train(df_train)
+    #
+    # train_pred = adaboost.predict(df_train)
+    # print(train_pred)
+    # train_acc = adaboost.accuracy(train_pred, df_train)
+    #
+    # valid_predict = adaboost.predict(df_valid)
+    # accuracy = adaboost.accuracy(valid_predict, df_valid)
+    #
+    # print("valid acc", accuracy)
+    # print("train acc:", train_acc)
 
-    adaboost = AdaBoost(DT, 5) # The number of weak leaners
+    n_learners = [1, 2, 5, 10, 15]
+    train_accs = []
+    valid_accs = []
+    for n_learner in n_learners:
+        DT = DecisionTree.DecisionTree(1)  # with max depth is one
+        adaboost = AdaBoost(DT, n_learner)  # The number of weak leaners
+        adaboost.train(df_train)
 
-    adaboost.train(df_train)
+        train_pred = adaboost.predict(df_train)
+        valid_pred = adaboost.predict(df_valid)
 
-    predict = adaboost.predict(df_valid)
+        train_acc = adaboost.accuracy(train_pred, df_train)
+        valid_acc = adaboost.accuracy(valid_pred, df_valid)
 
-    accuracy = adaboost.accuracy(predict, df_valid)
+        train_accs.append(train_acc)
+        valid_accs.append(valid_acc)
 
-    print(accuracy)
-
-if __name__ == '__main__':
-    main()
+    learners_plot(100*np.array(train_accs), 100*np.array(valid_accs), n_learners)
