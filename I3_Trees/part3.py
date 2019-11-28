@@ -62,26 +62,24 @@ class AdaBoost:
         return alpha
 
     # Method for prediction by a strong learner
-    def predict(self, df, alpha):
+    def predict(self, df, alpha, test=False):
 
         base_pred = np.zeros((self.num_learners, len(df)))
 
         for i in range(self.num_learners):
             for j, example in enumerate(df.iterrows()):
-                df_ex = df[df.index == j].drop("Class", axis=1)
+                if test==False:
+                    df_ex = df[df.index == j].drop("Class", axis=1)
+                else:
+                    df_ex = df[df.index == j]
                 prediction = self.learners[i].predict(df_ex, self.trees[i])
                 if prediction == 0:
                     prediction = -1
                 base_pred[i][j] = prediction
 
-            print("alpha: {0}".format(alpha))
-            print("prediction of weak leaner {0}: {1}".format(i, base_pred[i][0:10]))
-
         alpha = alpha / np.sum(alpha)
-        print(base_pred.shape)
-        voted_pred = np.sign(base_pred.T @ alpha)
 
-        print("prediction of strong leaner {0}".format(voted_pred[0:10]))
+        voted_pred = np.sign(base_pred.T @ alpha)
 
         return voted_pred
 
@@ -138,12 +136,11 @@ def main():
 
     df_train, df_valid, df_test = preprocess.get_data()
 
-    n_learners = [1, 2]
+    n_learners = [1, 2, 5, 10, 15]
     train_accs = []
     valid_accs = []
 
     for n_learner in n_learners:
-        print("")
         DT = DecisionTree.DecisionTree(1)  # with max depth is one
         adaboost = AdaBoost(DT, n_learner)  # The number of weak leaners
         alpha = adaboost.train(df_train)
@@ -155,11 +152,28 @@ def main():
         valid_acc = adaboost.accuracy(valid_pred, df_valid)
 
         print("training accuracy: {0}, validation accuracy: {1} for num. of leaners of {2}".format(train_acc, valid_acc, n_learner))
-        print("")
         train_accs.append(train_acc)
         valid_accs.append(valid_acc)
 
     learners_plot(100*np.array(train_accs), 100*np.array(valid_accs), n_learners)
+
+    n_learner = 6
+
+    DT = DecisionTree.DecisionTree(2)
+    adaboost = AdaBoost(DT, n_learner)
+    alpha = adaboost.train(df_train)
+
+    train_pred = adaboost.predict(df_train, alpha)
+    valid_pred = adaboost.predict(df_valid, alpha)
+
+    train_acc = adaboost.accuracy(train_pred, df_train)
+    valid_acc = adaboost.accuracy(valid_pred, df_valid)
+
+    print("training accuracy: {0}, validation accuracy: {1} for num. of leaners of {2}".format(train_acc, valid_acc, n_learner))
+
+    test_pred = adaboost.predict(df_test, alpha, True)
+    test_pred = pd.DataFrame(test_pred)
+    test_pred.to_csv('pa3_res.csv', header=False, index=False)
 
 if __name__ == '__main__':
 
